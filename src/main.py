@@ -18,10 +18,12 @@ from src.shaders.shaders import *
 from src.essentials.matrices import *
 from src.essentials.settings import *
 from src.essentials.base_3d_objects import *
+from src.data.level_loader import *
 
 
+# |===== MAIN PROGRAM CLASS =====|
 class FpsGame:
-    def __init__(self):
+    def __init__(self, mode):
 
         pygame.init()
         pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF)
@@ -31,6 +33,15 @@ class FpsGame:
 
         # Lock mouse and keyboard to game window
         pygame.event.set_grab(True)
+
+        # Load level
+        self.levelLoader = LevelLoader()
+        self.levelLoader.read_level(LEVEL_1)
+        self.levelGround = self.levelLoader.ground
+        self.levelWalls = self.levelLoader.walls
+        self.levelEvilObjects = self.levelLoader.evilObjects
+        self.startPoint = self.levelLoader.startPoint
+        self.endPoint = self.levelLoader.endPoint
 
         self.shader = Shader3D()
         self.shader.use()
@@ -57,6 +68,9 @@ class FpsGame:
 
         self.white_background = False
 
+        self.gameMode = mode
+
+    # |===== UPDATE =====|
     def update(self):
         delta_time = self.clock.tick() / 1000.0
 
@@ -86,6 +100,7 @@ class FpsGame:
             if mouseYNew < 0:
                 self.view_matrix.pitch(-mouseYNew * delta_time)
 
+    # |===== DISPLAY =====|
     def display(self):
         glEnable(GL_DEPTH_TEST)  ### --- NEED THIS FOR NORMAL 3D BUT MANY EFFECTS BETTER WITH glDisable(GL_DEPTH_TEST) ... try it! --- ###
 
@@ -160,6 +175,7 @@ class FpsGame:
 
         pygame.display.flip()
 
+    # |===== MAIN PROGRAM FUNCTION =====|
     def program_loop(self):
         exiting = False
         while not exiting:

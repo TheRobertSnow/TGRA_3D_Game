@@ -1,0 +1,406 @@
+{
+    "walls": [
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [0.0, 1.5, 17.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [35.5, 3.0, 0.5],
+            "comment": "Outer wall"
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [0.0, 1.5, -17.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [35.5, 3.0, 0.5],
+            "comment": "Outer wall"
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [17.5, 1.5, -10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 14.5],
+            "comment": "Outer wall"
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [17.5, 1.5, 8.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 18.0],
+            "comment": "Outer wall"
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-17.5, 1.5, -8.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 18.0],
+            "comment": "Outer wall"
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-17.5, 1.5, 10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 14.5],
+            "comment": "Outer wall"
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-12.25, 1.5, 14.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-15.75, 1.5, 10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-14.0, 1.5, 8.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-10.5, 1.5, 8.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 11.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-5.25, 1.5, 14.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-7.0, 1.5, 10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 7.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-3.5, 1.5, 15.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-3.5, 1.5, 7.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 7.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [7.0, 1.5, 7.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [14.5, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [3.5, 1.5, 10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [14.5, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [7.0, 1.5, 14.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [14.5, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [14.0, 1.5, 10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 7.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [10.5, 1.5, 3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 7.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [5.25, 1.5, 3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [15.75, 1.5, 3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [8.75, 1.5, 0.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [11.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [3.5, 1.5, -5.25],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 18.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [0.0, 1.5, 1.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-7.0, 1.5, 1.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-10.5, 1.5, -3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 7.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-14.0, 1.5, -12.25],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-10.5, 1.5, -12.25],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-7.0, 1.5, -7.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 7.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-3.5, 1.5, -5.25],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 11.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [0.0, 1.5, -14.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 7.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [7.0, 1.5, -14.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 7.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [10.5, 1.5, -12.25],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [10.5, 1.5, -5.25],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [14.0, 1.5, -1.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-12.25, 1.5, 0.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-15.75, 1.5, -3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-10.5, 1.5, -7.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [7.5, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-12.25, 1.5, -10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-5.25, 1.5, -14.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [11.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-5.25, 1.5, -10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [5.25, 1.5, -7.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [18.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [1.75, 1.5, -3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [8.75, 1.5, -3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [8.75, 1.5, -10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [12.25, 1.5, -14.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [15.75, 1.5, -10.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [15.75, 1.5, -3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [4.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [20.25, 1.5, -3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [6.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [20.25, 1.5, 0.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [6.0, 3.0, 0.5],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [23.25, 1.5, -1.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [0.5, 3.0, 4.0],
+            "comment": ""
+        },
+        {
+            "color3f": [0.8, 1.0, 0.8],
+            "translation3f": [-8.75, 1.5, 3.5],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [18.0, 3.0, 0.5],
+            "comment": "Long Wall 1"
+        }
+    ],
+    "evilObjects": [
+        {
+            "color3f": [1.0, 0.0, 1.0],
+            "translationStart3f": [0.25, 1.5, -6.5],
+            "translationEnd3f": [0.25, 1.5, -0.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [1.0, 3.0, 1.0],
+            "comment": "Evil 1"
+        },
+        {
+            "color3f": [1.0, 0.0, 1.0],
+            "translationStart3f": [-13.25, 1.5, -3.75],
+            "translationEnd3f": [-11.25, 1.5, -3.75],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [1.0, 3.0, 1.0],
+            "comment": "Evil 2"
+        }
+    ],
+    "ground": [
+        {
+            "color3f": [0.5, 0.5, 0.46],
+            "translation3f": [0.0, -0.05, 0.0],
+            "rotate3f": [0.0, 0.0, 0.0],
+            "scale3f": [100.0, 0.1, 100.0]
+        }
+    ],
+    "startPoint": [
+        {
+            "position": [-21.0, 1.5, 1.75]
+        }
+    ],
+    "endPoint": [
+        {
+            "color3f": [0.0, 1.0, 0.2],
+            "position": [21.0, 1.5, -1.75],
+            "scale3f": [3.0, 3.0, 3.0]
+        }
+    ]
+}

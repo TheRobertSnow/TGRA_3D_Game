@@ -41,6 +41,8 @@ class LSHIFT_KEY:
 MOVEMENTSPEED = 2
 
 # |===== SCENES =====|
+LEVEL_1 = "level1.json"
+COLLISION_TEST = "collisionTest.json"
 
 # |===== FILES =====|
 COMPLEX_3D_VERT = "/src/shaders/vert/complex3D.vert"
