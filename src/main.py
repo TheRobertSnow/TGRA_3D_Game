@@ -19,6 +19,7 @@ from src.essentials.matrices import *
 from src.essentials.settings import *
 from src.essentials.base_3d_objects import *
 from src.data.level_loader import *
+from src.data.types.player import *
 
 
 # |===== MAIN PROGRAM CLASS =====|
@@ -42,6 +43,8 @@ class FpsGame:
         self.levelEvilObjects = self.levelLoader.evilObjects
         self.startPoint = self.levelLoader.startPoint
         self.endPoint = self.levelLoader.endPoint
+
+        self.player = Player()
 
         self.shader = Shader3D()
         self.shader.use()
@@ -74,7 +77,7 @@ class FpsGame:
     def update(self):
         delta_time = self.clock.tick() / 1000.0
 
-        self.angle += pi * delta_time
+        #self.angle += pi * delta_time
         # if angle > 2 * pi:
         #     angle -= (2 * pi)
 
@@ -172,6 +175,9 @@ class FpsGame:
         self.shader.set_model_matrix(self.model_matrix.matrix)
         self.cube.draw(self.shader)
         self.model_matrix.pop_matrix()
+
+        self.player.render_scene()
+        self.player.player.render_scene()
 
         pygame.display.flip()
 
