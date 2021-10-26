@@ -93,6 +93,8 @@ class FpsGame:
 
         glViewport(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT)
 
+        glClearColor(0.78, 1.0, 1.0, 1.0)
+
         self.projection_matrix.set_perspective(pi / 2, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.1, 100)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
@@ -117,6 +119,10 @@ class FpsGame:
         self.shader.set_material_specualar(0.5, 0.5, 0.5)
         self.shader.set_material_shininess(5)
 
+        # Draw the lines of the polygon, but not fill it
+        # Good for working with hitbox
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+
         self.shader.set_material_diffuse(0.8, 0.8, 0.2)
         self.shader.set_material_ambient(1.0, 1.0, 0.0)
         self.model_matrix.push_matrix()
@@ -125,6 +131,8 @@ class FpsGame:
         self.shader.set_model_matrix(self.model_matrix.matrix)
         self.sphere.draw(self.shader)
         self.model_matrix.pop_matrix()
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
         self.cube.set_vertices(self.shader)
 
