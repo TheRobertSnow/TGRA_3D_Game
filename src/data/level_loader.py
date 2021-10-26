@@ -14,7 +14,7 @@ class LevelLoader:
     # Should load in levels from 'src/data/levels' into
     # appropriate class in 'src/assets/types'
     def __init__(self) -> None:
-        self.fPrefix = sys.path[0] + "/src/data/scenes/"
+        self.fPrefix = sys.path[0] + "/src/assets/scenes/"
 
         self.walls = []
         self.ground = []

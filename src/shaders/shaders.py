@@ -104,7 +104,7 @@ class Shader3D:
     def set_material_diffuse(self, red, green, blue):
         glUniform4f(self.materialDiffuseLoc, red, green, blue, 1.0)
 
-    def set_material_specualar(self, red, green, blue):
+    def set_material_specular(self, red, green, blue):
         glUniform4f(self.materialSpecularLoc, red, green, blue, 1.0)
 
     def set_material_ambient(self, red, green, blue):

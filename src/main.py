@@ -64,6 +64,8 @@ class FpsGame:
 
         self.angle = 0
 
+        self.speed = MOVEMENTSPEED
+
         self.mouseMove = False
 
         self.white_background = False
@@ -79,13 +81,17 @@ class FpsGame:
         #     angle -= (2 * pi)
 
         if W_KEY.isPressed:
-            self.view_matrix.slide(0, 0, -2 * delta_time)
+            self.view_matrix.slide(0, 0, -self.speed * delta_time)
         if A_KEY.isPressed:
-            self.view_matrix.slide(-2 * delta_time, 0, 0)
+            self.view_matrix.slide(-self.speed * delta_time, 0, 0)
         if S_KEY.isPressed:
-            self.view_matrix.slide(0, 0, 2 * delta_time)
+            self.view_matrix.slide(0, 0, self.speed * delta_time)
         if D_KEY.isPressed:
-            self.view_matrix.slide(2 * delta_time, 0, 0)
+            self.view_matrix.slide(self.speed * delta_time, 0, 0)
+        if LSHIFT_KEY.isPressed:
+            self.speed = MOVEMENTSPEED * 4
+        if not LSHIFT_KEY.isPressed:
+            self.speed = MOVEMENTSPEED
 
         if self.mouseMove:
             mouseXNew, mouseYNew = pygame.mouse.get_rel()
@@ -114,29 +120,98 @@ class FpsGame:
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
         self.model_matrix.load_identity()
-        self.sphere.set_vertices(self.shader)
+
 
         self.shader.set_view_matrix(self.view_matrix.get_matrix())
 
         self.shader.set_eye_position(self.view_matrix.eye)
         self.shader.set_global_ambient(0.2, 0.2, 0.2)
 
-        light_pos = [(0.0, 10.0, 0.0, 1.0), (0.0, 0.0, 10.0, 1.0)]
-        light_dif = [(1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0)]
-        light_spe = [(0.8, 0.8, 0.8, 1.0), (0.8, 0.8, 0.8, 1.0)]
-        light_amb = [(0.05, 0.05, 0.05, 1.0), (0.05, 0.05, 0.05, 1.0)]
+        light_pos = [(21.0, 1.5, 1.75, 1.0), (-21.0, 1.5, 1.75, 1.0), (0.0, 1.5, 1.75, 1.0)]
+        light_dif = [(1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0)]
+        light_spe = [(0.8, 0.8, 0.8, 1.0), (0.8, 0.8, 0.8, 1.0), (0.8, 0.8, 0.8, 1.0)]
+        light_amb = [(0.05, 0.05, 0.05, 1.0), (0.05, 0.05, 0.05, 1.0), (0.05, 0.05, 0.05, 1.0)]
 
         self.shader.set_light_pos(light_pos)
         self.shader.set_light_diffuse(light_dif)
         self.shader.set_light_specular(light_spe)
         self.shader.set_light_ambient(light_amb)
 
-        self.shader.set_material_specualar(0.5, 0.5, 0.5)
+        self.shader.set_material_specular(0.5, 0.5, 0.5)
         self.shader.set_material_shininess(5)
 
+        self.cube.set_vertices(self.shader)
+
+        # |===== DRAW OBJECTS =====|
+
+        # DRAW GROUND
+        for ground in self.levelGround:
+            self.shader.set_material_diffuse(ground.color[0], ground.color[1], ground.color[2])
+            self.shader.set_material_specular(0.1, 0.1, 0.1)
+            self.shader.set_material_ambient(0.1, 0.1, 0.1)
+            self.shader.set_material_shininess(1.0)
+            self.model_matrix.push_matrix()
+            self.model_matrix.add_translation(ground.translation[0], ground.translation[1], ground.translation[2])
+            self.model_matrix.add_rotate_x(ground.rotate[0])
+            self.model_matrix.add_rotate_y(ground.rotate[1])
+            self.model_matrix.add_rotate_z(ground.rotate[2])
+            self.model_matrix.add_scale(ground.scale[0], ground.scale[1], ground.scale[2])
+            self.shader.set_model_matrix(self.model_matrix.matrix)
+            self.cube.draw(self.shader)
+            self.model_matrix.pop_matrix()
+
+        # DRAW WALLS
+        for wall in self.levelWalls:
+            self.shader.set_material_diffuse(wall.color[0], wall.color[1], wall.color[2])
+            self.shader.set_material_specular(0.1, 0.1, 0.1)
+            self.shader.set_material_ambient(0.1, 0.1, 0.1)
+            self.shader.set_material_shininess(1.0)
+            self.model_matrix.push_matrix()
+            self.model_matrix.add_translation(wall.translation[0], wall.translation[1], wall.translation[2])
+            self.model_matrix.add_rotate_x(wall.rotate[0])
+            self.model_matrix.add_rotate_y(wall.rotate[1])
+            self.model_matrix.add_rotate_z(wall.rotate[2])
+            self.model_matrix.add_scale(wall.scale[0], wall.scale[1], wall.scale[2])
+            self.shader.set_model_matrix(self.model_matrix.matrix)
+            self.cube.draw(self.shader)
+            self.model_matrix.pop_matrix()
+
+        # DRAW EVIL OBJECTS
+        for evilObject in self.levelEvilObjects:
+            self.shader.set_material_diffuse(evilObject.color[0], evilObject.color[1], evilObject.color[2])
+            self.shader.set_material_specular(0.1, 0.1, 0.1)
+            self.shader.set_material_ambient(0.1, 0.1, 0.1)
+            self.shader.set_material_shininess(1.0)
+            self.model_matrix.push_matrix()
+            self.model_matrix.add_translation(evilObject.translationCurr.x, evilObject.translationCurr.y,
+                                                 evilObject.translationCurr.z)
+            self.model_matrix.add_rotate_x(evilObject.rotate[0])
+            self.model_matrix.add_rotate_y(evilObject.rotate[1])
+            self.model_matrix.add_rotate_z(evilObject.rotate[2])
+            self.model_matrix.add_scale(evilObject.scale[0], evilObject.scale[1], evilObject.scale[2])
+            self.shader.set_model_matrix(self.model_matrix.matrix)
+            self.cube.draw(self.shader)
+            self.model_matrix.pop_matrix()
+
+        # DRAW FINISH LINE BOX
+        self.shader.set_material_diffuse(self.endPoint[0].color[0], self.endPoint[0].color[1],
+                                        self.endPoint[0].color[2])
+        self.shader.set_material_specular(0.1, 0.1, 0.1)
+        self.shader.set_material_ambient(0.1, 0.1, 0.1)
+        self.shader.set_material_shininess(1.0)
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(self.endPoint[0].position[0], self.endPoint[0].position[1],
+                                        self.endPoint[0].position[2])
+        self.model_matrix.add_scale(self.endPoint[0].scale[0], self.endPoint[0].scale[1], self.endPoint[0].scale[2])
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.cube.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+
+        self.sphere.set_vertices(self.shader)
         # Draw the lines of the polygon, but not fill it
         # Good for working with hitbox
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
         self.shader.set_material_diffuse(0.8, 0.8, 0.2)
         self.shader.set_material_ambient(1.0, 1.0, 0.0)
@@ -147,7 +222,7 @@ class FpsGame:
         self.sphere.draw(self.shader)
         self.model_matrix.pop_matrix()
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+        # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
         self.cube.set_vertices(self.shader)
 
@@ -225,6 +300,7 @@ class FpsGame:
         # OUT OF GAME LOOP
         pygame.quit()
 
+    # |===== STARTS THE PROGRAM =====|
     def start(self):
         self.program_loop()
 
