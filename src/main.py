@@ -20,6 +20,7 @@ from src.essentials.settings import *
 from src.essentials.base_3d_objects import *
 from src.data.level_loader import *
 from src.data.types.player import *
+from src.data.mesh_loader import *
 #from src.player.player import Player
 
 
@@ -45,7 +46,9 @@ class FpsGame:
         self.startPoint = self.levelLoader.startPoint
         self.endPoint = self.levelLoader.endPoint
 
-        self.player = Player()
+        #self.player = Player()
+        #self.player = load_obj(sys.path[0] + "/src/data/objects/player.obj")
+        self.player = MeshLoader(sys.path[0] + "/src/data/objects/cent.obj")
 
         self.shader = Shader3D()
         self.shader.use()
@@ -254,9 +257,20 @@ class FpsGame:
         self.cube.draw(self.shader)
         self.model_matrix.pop_matrix()
 
-        self.player.render_scene()
-        self.player.player.render_scene()
-
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        glBegin(GL_TRIANGLES)
+        for index in self.player.f:
+            for f in index:
+                vertexDraw = self.player.v[int(f[0]) - 1]
+                #if int(f) % 3 == 1:
+                    #glColor4f(0.282, 0.239, 0.545, 0.35)
+                #elif int(f) % 3 == 2:
+                    #glColor4f(0.729, 0.333, 0.827, 0.35)
+                #else:
+                    #glColor4f(0.545, 0.000, 0.545, 0.35)
+                glVertex3fv(vertexDraw)
+        glEnd()
+        ##
         pygame.display.flip()
 
     # |===== MAIN PROGRAM FUNCTION =====|
