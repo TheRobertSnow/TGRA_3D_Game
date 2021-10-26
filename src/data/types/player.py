@@ -8,7 +8,7 @@ class Player:
         self.vertices = []
         self.faces = []
         self.coordinates = [0, 0, 0]  # [x,y,z]
-        self.player = MeshLoader(sys.path[0] + "/src/data/objects/teddy.obj")
+        self.player = MeshLoader(sys.path[0] + "/src/data/objects/player.obj")
         self.position = [0, 0, -5]
 
     def render_scene(self):
