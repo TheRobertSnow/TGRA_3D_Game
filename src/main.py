@@ -19,6 +19,7 @@ from src.essentials.matrices import *
 from src.essentials.settings import *
 from src.essentials.base_3d_objects import *
 from src.data.level_loader import *
+from src.player.player import Player
 
 
 # |===== MAIN PROGRAM CLASS =====|
@@ -55,6 +56,8 @@ class FpsGame:
         # self.projection_matrix.set_orthographic(-2, 2, -2, 2, 0.5, 100)
         self.projection_matrix.set_perspective(pi / 2, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.1, 100)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
+
+        # TODO: Add Player
 
         self.cube = Cube()
         self.sphere = Sphere()
