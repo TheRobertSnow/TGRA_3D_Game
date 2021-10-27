@@ -18,6 +18,7 @@ from src.shaders.shaders import *
 from src.essentials.matrices import *
 from src.essentials.settings import *
 from src.essentials.base_3d_objects import *
+from src.essentials.color import Color
 from src.data.level_loader import *
 from src.data.types.player import *
 from src.data.mesh_loader import *
@@ -48,7 +49,8 @@ class FpsGame:
 
         #self.player = Player()
         #self.player = load_obj(sys.path[0] + "/src/data/objects/player.obj")
-        self.player = MeshLoader(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
+        self.player = MeshLoader()
+        self.player.laodObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
         print(self.player.v)
         print(len(self.player.v))
         print(self.player.vn)
@@ -152,7 +154,7 @@ class FpsGame:
         self.shader.set_light_specular(light_spe)
         self.shader.set_light_ambient(light_amb)
 
-        self.shader.set_material_specular(0.5, 0.5, 0.5)
+        self.shader.set_material_specular(Color(0.5, 0.5, 0.5))
         self.shader.set_material_shininess(5)
 
         # self.cube.set_vertices(self.shader)
@@ -228,8 +230,8 @@ class FpsGame:
         # Good for working with hitbox
         # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
-        self.shader.set_material_diffuse(0.8, 0.8, 0.2)
-        self.shader.set_material_ambient(1.0, 1.0, 0.0)
+        self.shader.set_material_diffuse(Color(0.8, 0.8, 0.2))
+        self.shader.set_material_ambient(Color(1.0, 1.0, 0.0))
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(3.0, 0.0, 0.0)
         self.model_matrix.add_scale(2.0, 2.0, 2.0)
@@ -241,8 +243,8 @@ class FpsGame:
 
         self.cube.set_vertices(self.shader)
 
-        self.shader.set_material_diffuse(0.2, 0.2, 0.8)
-        self.shader.set_material_ambient(0.0, 0.0, 1.0)
+        self.shader.set_material_diffuse(Color(0.2, 0.2, 0.8))
+        self.shader.set_material_ambient(Color(0.0, 0.0, 1.0))
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(0.0, 3.0, 0.0)
         self.model_matrix.add_rotate_y(self.angle)
@@ -252,8 +254,8 @@ class FpsGame:
         self.cube.draw(self.shader)
         self.model_matrix.pop_matrix()
 
-        self.shader.set_material_diffuse(0.8, 0.2, 0.8)
-        self.shader.set_material_ambient(1.0, 0.0, 1.0)
+        self.shader.set_material_diffuse(Color(0.8, 0.2, 0.8))
+        self.shader.set_material_ambient(Color(1.0, 0.0, 1.0))
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(0.0, 0.0, -3.0)
         self.model_matrix.add_rotate_x(self.angle * 0.4)
@@ -268,13 +270,13 @@ class FpsGame:
         self.shader.set_position_attribute(self.player.v)
         self.shader.set_normal_attribute(self.player.vn)
 
-        self.shader.set_material_diffuse(0.2, 0.2, 0.8)
-        self.shader.set_material_ambient(0.0, 0.0, 1.0)
+        self.shader.set_material_diffuse(Color(0.2, 0.2, 0.8))
+        self.shader.set_material_ambient(Color(0.0, 0.0, 1.0))
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(-2.0, 0.0, 0.0)
         self.model_matrix.add_rotate_y(self.angle * 0.2)
-        self.model_matrix.add_rotate_z(-self.angle * 5)
-        self.model_matrix.add_rotate_x(self.angle * 3)
+        # self.model_matrix.add_rotate_z(-self.angle * 5)
+        # self.model_matrix.add_rotate_x(self.angle * 3)
         self.shader.set_model_matrix(self.model_matrix.matrix)
         i = 0
         for i in range(0, (int(len(self.player.v)/3))-1, 3):

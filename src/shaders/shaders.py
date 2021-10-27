@@ -1,9 +1,11 @@
 from OpenGL.GL import *
+from OpenGL.GLU import *
 from math import *  # trigonometry
 
 import sys
 
 from src.essentials.base_3d_objects import *
+from src.essentials.color import Color
 from src.essentials.settings import COMPLEX_3D_VERT, COMPLEX_3D_FRAG
 
 
@@ -101,14 +103,21 @@ class Shader3D:
     def set_light_ambient(self, ambient):
         glUniform4fv(self.lightAmbientLoc, len(ambient), ambient)
 
-    def set_material_diffuse(self, red, green, blue):
-        glUniform4f(self.materialDiffuseLoc, red, green, blue, 1.0)
+    def set_material_diffuse(self, diffuse: Color):
+        glUniform4f(self.materialDiffuseLoc, diffuse.red, diffuse.green, diffuse.blue, 1.0)
 
-    def set_material_specular(self, red, green, blue):
-        glUniform4f(self.materialSpecularLoc, red, green, blue, 1.0)
+    def set_material_specular(self, specular: Color):
+        glUniform4f(self.materialSpecularLoc, specular.red, specular.green, specular.blue, 1.0)
 
-    def set_material_ambient(self, red, green, blue):
-        glUniform4f(self.materialAmbientLoc, red, green, blue, 1.0)
+    def set_material_ambient(self, ambient: Color):
+        glUniform4f(self.materialAmbientLoc, ambient.red, ambient.green, ambient.blue, 1.0)
 
     def set_material_shininess(self, shine):
         glUniform1f(self.materialShininessLoc, shine)
+
+    # UV TEXTURES
+    def set_attribute_buffers(self, vertexBufferId):
+        glUniform1f(self.usingTextureLoc, 0.0)
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId)
+        glVertexAttribPointer(self.positionLoc, 3, GL_FLOAT, False, 6 * sizeof(GLfloat), OpenGL.GLU.ctypes.c_void_p(0))
+        glVertexAttribPointer(self.normalLoc, 3, GL_FLOAT, False, 6 * sizeof(GLfloat), OpenGL.GLU.ctypes.c_void_p(3 * sizeof(GLfloat)))
