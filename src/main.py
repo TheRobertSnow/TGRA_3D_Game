@@ -48,7 +48,7 @@ class FpsGame:
 
         #self.player = Player()
         #self.player = load_obj(sys.path[0] + "/src/data/objects/player.obj")
-        self.player = MeshLoader(sys.path[0] + "/src/data/objects/cent.obj")
+        self.player = MeshLoader(sys.path[0] + "/src/data/objects/jeff.obj")
 
         self.shader = Shader3D()
         self.shader.use()
@@ -261,14 +261,16 @@ class FpsGame:
         glBegin(GL_TRIANGLES)
         for index in self.player.f:
             for f in index:
-                vertexDraw = self.player.v[int(f[0]) - 1]
+                vertex = self.player.v[int(f[0]) - 1]
+                texture = self.player.vt[int(f[1]) - 1]
+                normal = self.player.vn[int(f[2]) - 1]
                 #if int(f) % 3 == 1:
                     #glColor4f(0.282, 0.239, 0.545, 0.35)
-                #elif int(f) % 3 == 2:
+                #elif int(f) % 3 == 2:w
                     #glColor4f(0.729, 0.333, 0.827, 0.35)
                 #else:
                     #glColor4f(0.545, 0.000, 0.545, 0.35)
-                glVertex3fv(vertexDraw)
+                glVertex3fv(vertex)
         glEnd()
         ##
         pygame.display.flip()
