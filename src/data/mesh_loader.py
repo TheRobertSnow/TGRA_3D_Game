@@ -2,35 +2,86 @@
 from OpenGL.GL import *
 class MeshLoader:
     def __init__(self, filename):
+        self.vTemp =[]
+        self.vtTemp = []
+        self.vnTemp = []
         self.v = []
         self.vt = []
         self.vn = []
         self.f = []
         self.filename = filename
-        #
+
         self.readFromFile()
+
 
     def lineParser(self, line):
         temp = line.strip("\n").split(" ")
         if temp[0] == "v":
-            self.v.append([float(temp[1]), float(temp[2]), float(temp[3])])
+            self.vTemp.append([float(temp[1]), float(temp[2]), float(temp[3])])
+            # self._vTemp.append(float(temp[1]))
+            # self._vTemp.append(float(temp[2]))
+            # self._vTemp.append(float(temp[3]))
         elif temp[0] == "vt":
-            self.vt.append([float(temp[1]), float(temp[2])])
+            self.vtTemp.append([float(temp[1]), float(temp[2])])
         elif temp[0] == "vn":
-            self.vn.append([float(temp[1]), float(temp[2]), float(temp[3])])
+            self.vnTemp.append([float(temp[1]), float(temp[2]), float(temp[3])])
+            # self.vn.append(float(temp[1]))
+            # self.vn.append(float(temp[2]))
+            # self.vn.append(float(temp[3]))
         elif temp[0] == "f":
-            temp1 = []
             for index, value in enumerate(temp):
                 if index != 0:
                     vid, tid, nid = value.split("/")
-                    temp1.append([int(vid), int(tid), int(nid)])
-            self.f.append(temp1)
+                    vid = int(vid)-1
+                    tid = int(tid)-1
+                    nid = int(nid)-1
+                    # Append v
+                    # [[x, y, z], [x, y, z],...]
+                    # res: [x, y, z, x, y, z,...]
+                    self.v.append(self.vTemp[vid][0])
+                    self.v.append(self.vTemp[vid][1])
+                    self.v.append(self.vTemp[vid][2])
+                    # Append vt
+                    # [[x, y], [x, y],...]
+                    # res: [x, y, x, y, x, y,...]
+                    self.vt.append(self.vtTemp[tid][0])
+                    self.vt.append(self.vtTemp[tid][1])
+                    # Append vn
+                    # [[x, y, z], [x, y, z],...]
+                    # res: [x, y, z, x, y, z,...]
+                    self.vn.append(self.vnTemp[nid][0])
+                    self.vn.append(self.vnTemp[nid][1])
+                    self.vn.append(self.vnTemp[nid][2])
+
+
+
+
+    # def lineParser(self, line):
+    #     temp = line.strip("\n").split(" ")
+    #     if temp[0] == "v":
+    #         self.v.append(float(temp[1]))
+    #         self.v.append(float(temp[2]))
+    #         self.v.append(float(temp[3]))
+    #     elif temp[0] == "vt":
+    #         self.vt.append([float(temp[1]), float(temp[2])])
+    #     elif temp[0] == "vn":
+    #         self.vn.append(float(temp[1]))
+    #         self.vn.append(float(temp[2]))
+    #         self.vn.append(float(temp[3]))
+    #     elif temp[0] == "f":
+    #         temp1 = []
+    #         for index, value in enumerate(temp):
+    #             if index != 0:
+    #                 vid, tid, nid = value.split("/")
+    #                 temp1.append([int(vid)-1, int(tid)-1, int(nid)-1])
+    #         self.f.append(temp1)
 
 
     def readFromFile(self):
         with open(self.filename, "r") as file:
             for line in file:
                 self.lineParser(line)
+
 
 
 
