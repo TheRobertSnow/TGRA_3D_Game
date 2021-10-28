@@ -14,6 +14,8 @@ def load_mtl_file(file_location, file_name, mesh_model):
         if tokens[0] == "newmtl":
             mtl = Material()
             mesh_model.add_material(tokens[1], mtl)
+        elif tokens[0] == "Ka":
+            mtl.ambient = Color(float(tokens[1]), float(tokens[2]), float(tokens[3]))
         elif tokens[0] == "Kd":
             mtl.diffuse = Color(float(tokens[1]), float(tokens[2]), float(tokens[3]))
         elif tokens[0] == "Ks":
