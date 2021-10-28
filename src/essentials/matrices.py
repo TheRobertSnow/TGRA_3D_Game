@@ -117,6 +117,7 @@ class ViewMatrix:
         self.v = Vector(0, 1, 0)
         self.n = Vector(0, 0, 1)
         self.direction = Vector(-1, 0, 0)
+        self.upwardsSpeed = 0
 
     def look(self, eye, center, up):
         self.eye = eye
@@ -126,9 +127,15 @@ class ViewMatrix:
         self.u.normalize()
         self.v = self.n.cross(self.u)
         self.v.normalize()
+        self.direction.x = self.n.x
+        self.direction.z = self.n.z
 
     def slide(self, del_u, del_v, del_n):
-        self.eye += self.u * del_u + self.v * del_v + self.n * del_n
+        # self.eye += self.u * del_u + self.v * del_v + self.n * del_n
+        self.eye += self.u * del_u + self.v * del_v + self.direction * del_n
+
+    def jump(self, del_y):
+        self.eye += self.v * del_y
 
     def move(self, del_u, del_v, del_n, jeff):
         posX = jeff[0]

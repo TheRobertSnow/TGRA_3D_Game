@@ -37,8 +37,17 @@ class LSHIFT_KEY:
     key: int = pygame.K_LSHIFT
     isPressed: bool = False
 
-# |===== PLAYER MOVEMENT =====|
-MOVEMENTSPEED = 2
+@dataclass
+class SPACE_BAR:
+    key: int = pygame.K_SPACE
+    isPressed: bool = False
+
+# |===== PLAYER =====|
+CAMERA_HEIGHT = 1.8
+MOVEMENTSPEED = 10
+GRAVITY = -50
+JUMP_POWER = 18
+
 
 # |===== SCENES =====|
 LEVEL_1 = "level1.json"

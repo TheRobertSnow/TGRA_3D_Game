@@ -1,5 +1,3 @@
-# 10.25.2021
-# Róbert Snær Harðarson
 
 # |===== IMPORTS =====|
 
@@ -20,9 +18,8 @@ from src.essentials.settings import *
 from src.essentials.base_3d_objects import *
 from src.essentials.color import Color
 from src.data.level_loader import *
-from src.data.types.player import *
 from src.data.mesh_loader import *
-#from src.player.player import Player
+from src.player.player import Player
 
 
 # |===== MAIN PROGRAM CLASS =====|
@@ -32,13 +29,7 @@ class FpsGame:
         pygame.init()
         pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF)
 
-        # Hide the mouse cursor
-        pygame.mouse.set_visible(False)
-
-        # Lock mouse and keyboard to game window
-        pygame.event.set_grab(True)
-
-        # Load level
+        # /==/ Level Loader /==/
         self.levelLoader = LevelLoader()
         self.levelLoader.read_level(LEVEL_1)
         self.levelGround = self.levelLoader.ground
@@ -47,46 +38,57 @@ class FpsGame:
         self.startPoint = self.levelLoader.startPoint
         self.endPoint = self.levelLoader.endPoint
 
-        #self.player = Player()
-        #self.player = load_obj(sys.path[0] + "/src/data/objects/player.obj")
+        # /==/ Mesh Loader /==/
         self.player = MeshLoader()
-        self.player.laodObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
+        self.player.loadObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
         print(self.player.v)
         print(len(self.player.v))
         print(self.player.vn)
         print(len(self.player.vn))
         print(len(self.player.vt))
 
-
+        # /==/ Shaders /==/
         self.shader = Shader3D()
         self.shader.use()
 
+        # /==/ Model Matrix /==/
         self.model_matrix = ModelMatrix()
 
+        # /==/ View Matrix /==/
         self.view_matrix = ViewMatrix()
-        self.view_matrix.look(Point(3, 3, 3), Point(0, 0, 0), Vector(0, 1, 0))
+        self.view_matrix.look(Point(1, 1.8, 0), Point(0, 0, 0), Vector(0, 1, 0))
 
+        # /==/ Projection Matrix /==/
         self.projection_matrix = ProjectionMatrix()
         # self.projection_matrix.set_orthographic(-2, 2, -2, 2, 0.5, 100)
         self.projection_matrix.set_perspective(pi / 2, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.1, 100)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
-        # TODO: Add Player
+        # /==/ Players /==/
+        self.playerCharacter = Player()
+        self.opponents = []
 
+        # /==/ Meshes /==/
         self.cube = Cube()
         self.sphere = Sphere()
 
+        # /==/ Time /==/
         self.clock = pygame.time.Clock()
         self.clock.tick()
 
+        # /==/ Init Input /==/
+        # Hide the mouse cursor
+        pygame.mouse.set_visible(False)
+        # Lock mouse and keyboard to game window
+        pygame.event.set_grab(True)
+
+        # /==/ Variables /==/
         self.angle = 0
-
         self.speed = MOVEMENTSPEED
-
+        self.upwards = 0
+        self.jumping = False
         self.mouseMove = False
-
         self.white_background = False
-
         self.gameMode = mode
 
     # |===== UPDATE =====|
@@ -97,6 +99,7 @@ class FpsGame:
         # if self.angle > 2 * pi:
         #     self.angle -= (2 * pi)
 
+        # /==/ User Input /==/
         if W_KEY.isPressed:
             self.view_matrix.slide(0, 0, -self.speed * delta_time)
         if A_KEY.isPressed:
@@ -106,9 +109,17 @@ class FpsGame:
         if D_KEY.isPressed:
             self.view_matrix.slide(self.speed * delta_time, 0, 0)
         if LSHIFT_KEY.isPressed:
-            self.speed = MOVEMENTSPEED * 4
+            self.speed = MOVEMENTSPEED * 2
         if not LSHIFT_KEY.isPressed:
             self.speed = MOVEMENTSPEED
+
+        # /==/ Jumping Logic /==/
+        self.upwards += GRAVITY * delta_time
+        self.view_matrix.eye.y += self.upwards * delta_time
+        if (self.view_matrix.eye.y < CAMERA_HEIGHT):
+            self.upwards = 0
+            self.view_matrix.eye.y = CAMERA_HEIGHT
+            self.jumping = False
 
         if self.mouseMove:
             mouseXNew, mouseYNew = pygame.mouse.get_rel()
@@ -300,6 +311,10 @@ class FpsGame:
         #         glVertex3fv(vertex)
         # glEnd()
         # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+
+        # /==/ Draw Hud /==/
+        glDisable(GL_DEPTH_TEST)
+
         pygame.display.flip()
 
     # |===== MAIN PROGRAM FUNCTION =====|
@@ -327,6 +342,11 @@ class FpsGame:
                         D_KEY.isPressed = True
                     if event.key == LSHIFT_KEY.key:
                         LSHIFT_KEY.isPressed = True
+                    if event.key == SPACE_BAR.key:
+                        SPACE_BAR.isPressed = True
+                        if not self.jumping:
+                            self.upwards = JUMP_POWER
+                            self.jumping = True
 
 
                 elif event.type == pygame.KEYUP:
@@ -340,6 +360,8 @@ class FpsGame:
                         D_KEY.isPressed = False
                     if event.key == LSHIFT_KEY.key:
                         LSHIFT_KEY.isPressed = False
+                    if event.key == SPACE_BAR.key:
+                        SPACE_BAR.isPressed = False
 
                 elif event.type == pygame.MOUSEMOTION:
                     self.mouseMove = True

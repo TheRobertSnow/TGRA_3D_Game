@@ -104,7 +104,7 @@ class MeshLoader:
             for line in file:
                 self.mtl_parser(line)
 
-    def laodObj(self, fName):
+    def loadObj(self, fName):
         with open(fName, "r") as file:
             for line in file:
                 self.obj_parser(line)

@@ -17,4 +17,3 @@ class NetInterface:
 
     def connect_to(self):
         self.sock.connect()
-        self.sock.setblocking(False)
