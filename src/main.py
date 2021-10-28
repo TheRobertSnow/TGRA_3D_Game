@@ -50,13 +50,14 @@ class FpsGame:
         #self.player = Player()
         #self.player = load_obj(sys.path[0] + "/src/data/objects/player.obj")
         self.player = MeshLoader()
-        self.player.laodObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
-        print(self.player.v)
-        print(len(self.player.v))
-        print(self.player.vn)
-        print(len(self.player.vn))
-        print(len(self.player.vt))
-
+        #self.player.laodObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
+        self.player.loadMtl(sys.path[0] + "/src/assets/meshes/player/jeff.mtl")
+        self.player.loadObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
+        # print(self.player.v)
+        # print(len(self.player.v))
+        # print(self.player.vn)
+        # print(len(self.player.vn))
+        # print(len(self.player.vt))
 
         self.shader = Shader3D()
         self.shader.use()
@@ -265,24 +266,7 @@ class FpsGame:
         self.cube.draw(self.shader)
         self.model_matrix.pop_matrix()
 
-
-
-        self.shader.set_position_attribute(self.player.v)
-        self.shader.set_normal_attribute(self.player.vn)
-
-        self.shader.set_material_diffuse(Color(0.2, 0.2, 0.8))
-        self.shader.set_material_ambient(Color(0.0, 0.0, 1.0))
-        self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(-2.0, 0.0, 0.0)
-        self.model_matrix.add_rotate_y(self.angle * 0.2)
-        # self.model_matrix.add_rotate_z(-self.angle * 5)
-        # self.model_matrix.add_rotate_x(self.angle * 3)
-        self.shader.set_model_matrix(self.model_matrix.matrix)
-        i = 0
-        for i in range(0, (int(len(self.player.v)/3))-1, 3):
-            glDrawArrays(GL_TRIANGLE_FAN, i, 3)
-
-        self.model_matrix.pop_matrix()
+        self.player.mesh.draw(self.shader, self.model_matrix)
 
         # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
         # glBegin(GL_TRIANGLES)
