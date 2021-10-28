@@ -21,7 +21,7 @@ from src.essentials.base_3d_objects import *
 from src.essentials.color import Color
 from src.data.level_loader import *
 from src.data.types.player import *
-from src.data.mesh_loader import *
+from src.data import kari_loader
 #from src.player.player import Player
 
 
@@ -47,17 +47,12 @@ class FpsGame:
         self.startPoint = self.levelLoader.startPoint
         self.endPoint = self.levelLoader.endPoint
 
-        #self.player = Player()
-        #self.player = load_obj(sys.path[0] + "/src/data/objects/player.obj")
-        self.player = MeshLoader()
-        #self.player.laodObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
-        self.player.loadMtl(sys.path[0] + "/src/assets/meshes/player/jeff.mtl")
-        self.player.loadObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
-        # print(self.player.v)
-        # print(len(self.player.v))
-        # print(self.player.vn)
-        # print(len(self.player.vn))
-        # print(len(self.player.vt))
+        self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
+        self.mr_box = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/mr_box", "mr_box.obj")
+        self.cent = kari_loader.load_obj_file(sys.path[0] + "/src/data/objects", "cent.obj")
+
+        self.texture_0 = self.load_texture("/src/assets/meshes/player/jeff.png")
+        self.texture_1 = self.load_texture("/src/assets/meshes/mr_box/box.png")
 
         self.shader = Shader3D()
         self.shader.use()
@@ -89,6 +84,19 @@ class FpsGame:
         self.white_background = False
 
         self.gameMode = mode
+
+    def load_texture(self, filePath):
+        # Loading and Binding Texture
+        surface = pygame.image.load(sys.path[0] + filePath)
+        tex_string = pygame.image.tostring(surface, "RGBA", 1)
+        width = surface.get_width()
+        height = surface.get_height()
+        tex_id = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, tex_id)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
+        return tex_id
 
     # |===== UPDATE =====|
     def update(self):
@@ -136,16 +144,11 @@ class FpsGame:
 
         self.projection_matrix.set_perspective(pi / 2, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.1, 100)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
-
+        self.shader.set_eye_position(self.view_matrix.eye)
         self.model_matrix.load_identity()
-
-
         self.shader.set_view_matrix(self.view_matrix.get_matrix())
 
-        self.shader.set_eye_position(self.view_matrix.eye)
-        self.shader.set_global_ambient(0.2, 0.2, 0.2)
-
-        light_pos = [(21.0, 1.5, 1.75, 1.0), (-21.0, 1.5, 1.75, 1.0), (0.0, 1.5, 1.75, 1.0)]
+        light_pos = [(21.0, 10.0, 1.75, 1.0), (-21.0, 1.5, 1.75, 1.0), (0.0, 1.5, 1.75, 1.0)]
         light_dif = [(1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0)]
         light_spe = [(0.8, 0.8, 0.8, 1.0), (0.8, 0.8, 0.8, 1.0), (0.8, 0.8, 0.8, 1.0)]
         light_amb = [(0.05, 0.05, 0.05, 1.0), (0.05, 0.05, 0.05, 1.0), (0.05, 0.05, 0.05, 1.0)]
@@ -154,9 +157,12 @@ class FpsGame:
         self.shader.set_light_diffuse(light_dif)
         self.shader.set_light_specular(light_spe)
         self.shader.set_light_ambient(light_amb)
+        self.shader.set_global_ambient(0.2, 0.2, 0.2)
 
-        self.shader.set_material_specular(Color(0.5, 0.5, 0.5))
-        self.shader.set_material_shininess(5)
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.texture_0)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, self.texture_1)
 
         # self.cube.set_vertices(self.shader)
         #
@@ -226,15 +232,18 @@ class FpsGame:
         # self.model_matrix.pop_matrix()
 
 
-        self.sphere.set_vertices(self.shader)
+        #self.sphere.set_vertices(self.shader)
         # Draw the lines of the polygon, but not fill it
         # Good for working with hitbox
         # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
+        self.shader.set_diffuse_tex(0)
+        self.shader.set_specular_tex(0)
+        self.shader.set_ambient_tex(0)
         self.shader.set_material_diffuse(Color(0.8, 0.8, 0.2))
         self.shader.set_material_ambient(Color(1.0, 1.0, 0.0))
         self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(3.0, 0.0, 0.0)
+        self.model_matrix.add_translation(3.0, 5.0, 10.0)
         self.model_matrix.add_scale(2.0, 2.0, 2.0)
         self.shader.set_model_matrix(self.model_matrix.matrix)
         self.sphere.draw(self.shader)
@@ -242,19 +251,24 @@ class FpsGame:
 
         # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
-        self.cube.set_vertices(self.shader)
+        #self.cube.set_vertices(self.shader)
+        #self.shader.set_diffuse_tex(1)
+        # self.shader.set_specular_tex(1)
+        # self.shader.set_ambient_tex(1)
+        # self.shader.set_material_diffuse(Color(0.2, 0.2, 0.8))
+        # self.shader.set_material_ambient(Color(0.0, 0.0, 1.0))
+        # self.model_matrix.push_matrix()
+        # self.model_matrix.add_translation(0.0, 3.0, 0.0)
+        # self.model_matrix.add_rotate_y(self.angle)
+        # self.model_matrix.add_rotate_z(self.angle)
+        # self.model_matrix.add_scale(0.2, 2.5, 1.5)
+        # self.shader.set_model_matrix(self.model_matrix.matrix)
+        # self.cube.draw(self.shader)
+        # self.model_matrix.pop_matrix()
 
-        self.shader.set_material_diffuse(Color(0.2, 0.2, 0.8))
-        self.shader.set_material_ambient(Color(0.0, 0.0, 1.0))
-        self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(0.0, 3.0, 0.0)
-        self.model_matrix.add_rotate_y(self.angle)
-        self.model_matrix.add_rotate_z(self.angle)
-        self.model_matrix.add_scale(0.2, 2.5, 1.5)
-        self.shader.set_model_matrix(self.model_matrix.matrix)
-        self.cube.draw(self.shader)
-        self.model_matrix.pop_matrix()
-
+        self.shader.set_diffuse_tex(1)
+        self.shader.set_specular_tex(1)
+        self.shader.set_ambient_tex(1)
         self.shader.set_material_diffuse(Color(0.8, 0.2, 0.8))
         self.shader.set_material_ambient(Color(1.0, 0.0, 1.0))
         self.model_matrix.push_matrix()
@@ -266,24 +280,34 @@ class FpsGame:
         self.cube.draw(self.shader)
         self.model_matrix.pop_matrix()
 
-        self.player.mesh.draw(self.shader, self.model_matrix)
+        self.shader.set_diffuse_tex(1)
+        self.shader.set_specular_tex(1)
+        self.shader.set_ambient_tex(1)
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(5.0, 1.0, 1.0)
+        self.model_matrix.add_scale(1.0, 1.0, 1.0)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.mr_box.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+        self.shader.set_diffuse_tex(0)
+        self.shader.set_specular_tex(0)
+        self.shader.set_ambient_tex(0)
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(1.0, 1.0, 1.0)
+        self.model_matrix.add_scale(1.0, 1.0, 1.0)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.player.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(4.0, 4.0, 4.0)
+        self.model_matrix.add_scale(0.1, 0.1, 0.1)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.cent.draw(self.shader)
+        self.model_matrix.pop_matrix()
 
         # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-        # glBegin(GL_TRIANGLES)
-        # for index in self.player.f:
-        #     for f in index:
-        #         vertex = self.player.v[int(f[0])]
-        #         texture = self.player.vt[int(f[1])]
-        #         normal = self.player.vn[int(f[2])]
-        #         #if int(f) % 3 == 1:
-        #             #glColor4f(0.282, 0.239, 0.545, 0.35)
-        #         #elif int(f) % 3 == 2:w
-        #             #glColor4f(0.729, 0.333, 0.827, 0.35)
-        #         #else:
-        #             #glColor4f(0.545, 0.000, 0.545, 0.35)
-        #         glVertex3fv(vertex)
-        # glEnd()
-        # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         pygame.display.flip()
 
     # |===== MAIN PROGRAM FUNCTION =====|

@@ -26,17 +26,17 @@ void main(void)
 
 //	Local coordinates
 	position = u_model_matrix * position;
-	v_normal = u_model_matrix * normal;
+	v_normal = normalize(u_model_matrix * normal);
 
 //	Local coordinates
-    vec4 v = u_eye_position - position;
+    vec4 v = normalize(u_eye_position - position);
     for (int i = 0; i < 2; i++) {
-        v_s[i] = u_light_position[i] - position;
-        v_h[i] = v_s[i] + v;
+        v_s[i] = normalize(u_light_position[i] - position);
+        v_h[i] = normalize(v_s[i] + v);
     }
 
-
-	position = u_projection_matrix * (u_view_matrix * position);
+	position = u_view_matrix * position;
+	position = u_projection_matrix * position;
 
 	gl_Position = position;
 }

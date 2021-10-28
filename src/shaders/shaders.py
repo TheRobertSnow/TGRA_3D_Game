@@ -40,8 +40,8 @@ class Shader3D:
         self.normalLoc = glGetAttribLocation(self.renderingProgramID, "a_normal")
         glEnableVertexAttribArray(self.normalLoc)
 
-        #self.uvLoc = glGetAttribLocation(self.renderingProgramID, "a_uv")
-        #glEnableVertexAttribArray(self.uvLoc)
+        self.uvLoc = glGetAttribLocation(self.renderingProgramID, "a_uv")
+        glEnableVertexAttribArray(self.uvLoc)
 
         self.modelMatrixLoc = glGetUniformLocation(self.renderingProgramID, "u_model_matrix")
         self.viewMatrixLoc = glGetUniformLocation(self.renderingProgramID, "u_view_matrix")
@@ -50,11 +50,11 @@ class Shader3D:
         # self.colorLoc                         = glGetUniformLocation(self.renderingProgramID, "u_color")
         self.eyePositionLoc = glGetUniformLocation(self.renderingProgramID, "u_eye_position")
 
-        #self.diffuseTextureLoc = glGetUniformLocation(self.renderingProgramID, "u_tex01")
-        #self.specularTextureLoc = glGetUniformLocation(self.renderingProgramID, "u_tex02")
-        #self.ambientTextureLoc = glGetUniformLocation(self.renderingProgramID, "u_tex03")
+        self.diffuseTextureLoc = glGetUniformLocation(self.renderingProgramID, "u_tex01")
+        self.specularTextureLoc = glGetUniformLocation(self.renderingProgramID, "u_tex02")
+        self.ambientTextureLoc = glGetUniformLocation(self.renderingProgramID, "u_tex03")
 
-        #self.usingTextureLoc = glGetUniformLocation(self.renderingProgramID, "u_using_texture")
+        self.usingTextureLoc = glGetUniformLocation(self.renderingProgramID, "u_using_texture")
 
         self.globalAmbientLoc = glGetUniformLocation(self.renderingProgramID, "u_global_ambient")
         self.lightPositionLoc = glGetUniformLocation(self.renderingProgramID, "u_light_position")
@@ -92,9 +92,17 @@ class Shader3D:
     def set_normal_attribute(self, vertex_array):
         glVertexAttribPointer(self.normalLoc, 3, GL_FLOAT, False, 0, vertex_array)
 
-    #def set_uv_attribute(self, vertex_array):
-        #print(vertex_array)
-        #glVertexAttribPointer(self.uvLoc, 2, GL_FLOAT, False, 0, vertex_array)
+    def set_uv_attribute(self, vertex_array):
+        glVertexAttribPointer(self.uvLoc, 2, GL_FLOAT, False, 0, vertex_array)
+
+    def set_diffuse_tex(self, number):
+        glUniform1i(self.diffuseTextureLoc, number)
+
+    def set_specular_tex(self, number):
+        glUniform1i(self.specularTextureLoc, number)
+
+    def set_ambient_tex(self, number):
+        glUniform1i(self.ambientTextureLoc, number)
 
 
     # MULTIPLE LIGHTS
@@ -128,6 +136,12 @@ class Shader3D:
     def set_material_shininess(self, shine):
         glUniform1f(self.materialShininessLoc, shine)
 
+    def set_attribute_buffers(self, vertex_buffer_id):
+        glUniform1f(self.usingTextureLoc, 0.0)
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id)
+        glVertexAttribPointer(self.positionLoc, 3, GL_FLOAT, False, 6 * sizeof(GLfloat), OpenGL.GLU.ctypes.c_void_p(0))
+        glVertexAttribPointer(self.normalLoc, 3, GL_FLOAT, False, 6 * sizeof(GLfloat),
+                              OpenGL.GLU.ctypes.c_void_p(3 * sizeof(GLfloat)))
     # UV TEXTURES
     def set_attribute_buffers_with_uv(self, vertexBufferId):
         glUniform1f(self.usingTextureLoc, 1.0)
