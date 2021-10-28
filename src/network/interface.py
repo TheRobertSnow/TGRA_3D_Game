@@ -1,19 +1,31 @@
 # TODO: Þarf að gera class sem sér um network draslið
-import socket
-from socket import *
+import selectors
+import types
+
 from src.essentials.settings import *
 
-class NetInterface:
+from socket import *
+
+IP_ADDR = "127.0.0.1"
+PORT = 6969 #Nice
+
+class Interface:
     def __init__(self):
-        # Create a UDP IPv4 socket
-        self.sock = socket(AF_INET, SOCK_DGRAM, protocol=0)
+        self.sock = socket(AF_INET, SOCK_STREAM)
         self.sock.setblocking(False)
+        self.sock.connect_ex((IP_ADDR, PORT))
+        # events = selectors.EVENT_READ | selectors.EVENT_WRITE
+        # data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
 
-    def host(self):
-        self.sock.bind(INADDR_ANY, PORT)
-        self.sock.listen()
-        conn, addr = self.sock.accept()
-        conn.setblocking(False)
+    def send(self, data):
+        self.sock.send(bytes(data, "utf-8"))
 
-    def connect_to(self):
-        self.sock.connect()
+    def recv(self):
+        try:
+            data = self.sock.recv(1024)
+            return repr(data)
+        except BlockingIOError:
+            return ""
+
+if __name__ == "__main__":
+    net = Interface()

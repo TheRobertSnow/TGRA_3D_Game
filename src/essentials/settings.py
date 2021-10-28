@@ -58,7 +58,7 @@ COMPLEX_3D_VERT = "/src/shaders/vert/complex3D.vert"
 COMPLEX_3D_FRAG = "/src/shaders/frag/complex3D.frag"
 
 # |===== NETWORK =====|
-EXTERNAL_IP = "157.97.11.131"
+EXTERNAL_IP = "127.0.0.1"
 PORT = 6969   # Nice
 
 # |===== RUN MODES =====|

@@ -20,6 +20,7 @@ from src.essentials.color import Color
 from src.data.level_loader import *
 from src.data.mesh_loader import *
 from src.player.player import Player
+from src.network.interface import Interface
 
 
 # |===== MAIN PROGRAM CLASS =====|
@@ -46,6 +47,9 @@ class FpsGame:
         print(self.player.vn)
         print(len(self.player.vn))
         print(len(self.player.vt))
+
+        # /==/ Netwrok Interface /==/
+        self.netInterf = Interface()
 
         # /==/ Shaders /==/
         self.shader = Shader3D()
@@ -133,6 +137,9 @@ class FpsGame:
                 self.view_matrix.pitch(-mouseYNew * delta_time)
             if mouseYNew < 0:
                 self.view_matrix.pitch(-mouseYNew * delta_time)
+
+        self.netInterf.send("U r gay")
+        print(self.netInterf.recv())
 
     # |===== DISPLAY =====|
     def display(self):
