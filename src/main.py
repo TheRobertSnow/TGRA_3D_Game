@@ -42,9 +42,8 @@ class FpsGame:
         # /==/ Network Interface /==/
         self.netInterf = Interface()
         # self.netId = uuid.uuid1()
-        self.netId = "Rubs"
+        self.netId = "Daniel"
         self.xzAngle = 0.0
-        self.yAngle = 0.0
 
         # /==/ Mesh Loader /==/
         self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
@@ -78,6 +77,8 @@ class FpsGame:
         self.playerCharacter = Player()
         self.opponents = {}
 
+        self.bullets = []
+
         # /==/ Meshes /==/
         self.cube = Cube()
         self.sphere = Sphere()
@@ -100,6 +101,7 @@ class FpsGame:
         self.upwards = 0
         self.jumping = False
         self.mouseMove = False
+        self.fireGun = False
         self.white_background = False
         self.gameMode = mode
 
@@ -122,7 +124,6 @@ class FpsGame:
         netStr = str(self.netId) + ";"
         netStr += self.view_matrix.get_eye_str()
         netStr += str(self.xzAngle) + ";"
-        # netStr += str(self.yAngle) + ";"
         return netStr
 
     # |===== Decode Net String =====|
@@ -136,8 +137,7 @@ class FpsGame:
             return
         self.opponents[temp[0]] = {
             "eye": Point(float(eyex), float(eyey), float(eyez)),
-            "xzAngle": float(temp[2]),
-            # "yAngle": float(temp[3]),
+            "xzAngle": float(temp[2])
         }
 
 
@@ -193,7 +193,6 @@ class FpsGame:
             mouseXNew = (mouseXNew / 25) * 15
             self.xzAngle += -mouseXNew * delta_time
             mouseYNew = (mouseYNew / 25) * 15
-            self.yAngle += -mouseYNew * delta_time
             if mouseXNew > 0:
                 self.view_matrix.yaw(-mouseXNew * delta_time)
             if mouseXNew < 0:
@@ -215,6 +214,10 @@ class FpsGame:
             recvString = self.netInterf.recv()
             if recvString != "":
                 self.decode_net_str(recvString)
+
+        if self.fireGun:
+            # /==/ Do some gun shit /==/
+            pass
 
     # |===== DISPLAY =====|
     def display(self):
@@ -250,15 +253,15 @@ class FpsGame:
         glActiveTexture(GL_TEXTURE2)
         glBindTexture(GL_TEXTURE_2D, self.texture_2)
 
-        # self.cube.set_vertices(self.shader)
-        #
-        # # |===== DRAW OBJECTS =====|
-        #
-        # # DRAW GROUND
+        self.cube.set_vertices(self.shader)
+
+        # |===== DRAW OBJECTS =====|
+
+        # DRAW GROUND
         # for ground in self.levelGround:
-        #     self.shader.set_material_diffuse(ground.color[0], ground.color[1], ground.color[2])
-        #     self.shader.set_material_specular(0.1, 0.1, 0.1)
-        #     self.shader.set_material_ambient(0.1, 0.1, 0.1)
+        #     self.shader.set_material_diffuse(Color(ground.color[0], ground.color[1], ground.color[2]))
+        #     self.shader.set_material_specular(Color(0.1, 0.1, 0.1))
+        #     self.shader.set_material_ambient(Color(0.1, 0.1, 0.1))
         #     self.shader.set_material_shininess(1.0)
         #     self.model_matrix.push_matrix()
         #     self.model_matrix.add_translation(ground.translation[0], ground.translation[1], ground.translation[2])
@@ -272,9 +275,9 @@ class FpsGame:
         #
         # # DRAW WALLS
         # for wall in self.levelWalls:
-        #     self.shader.set_material_diffuse(wall.color[0], wall.color[1], wall.color[2])
-        #     self.shader.set_material_specular(0.1, 0.1, 0.1)
-        #     self.shader.set_material_ambient(0.1, 0.1, 0.1)
+        #     self.shader.set_material_diffuse(Color(wall.color[0], wall.color[1], wall.color[2]))
+        #     self.shader.set_material_specular(Color(0.1, 0.1, 0.1))
+        #     self.shader.set_material_ambient(Color(0.1, 0.1, 0.1))
         #     self.shader.set_material_shininess(1.0)
         #     self.model_matrix.push_matrix()
         #     self.model_matrix.add_translation(wall.translation[0], wall.translation[1], wall.translation[2])
@@ -318,7 +321,7 @@ class FpsGame:
         # self.model_matrix.pop_matrix()
 
 
-        #self.sphere.set_vertices(self.shader)
+        # self.sphere.set_vertices(self.shader)
         # Draw the lines of the polygon, but not fill it
         # Good for working with hitbox
         # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
@@ -366,25 +369,25 @@ class FpsGame:
         # self.cube.draw(self.shader)
         # self.model_matrix.pop_matrix()
         #
-        # self.shader.set_diffuse_tex(2)
-        # self.shader.set_specular_tex(2)
-        # self.shader.set_ambient_tex(2)
-        # self.model_matrix.push_matrix()
-        # self.model_matrix.add_translation(5.0, 1.0, 1.0)
-        # self.model_matrix.add_scale(1.0, 1.0, 1.0)
-        # self.shader.set_model_matrix(self.model_matrix.matrix)
-        # self.mr_box.draw(self.shader)
-        # self.model_matrix.pop_matrix()
-        #
-        self.shader.set_diffuse_tex(0)
-        self.shader.set_specular_tex(0)
-        self.shader.set_ambient_tex(0)
+        self.shader.set_diffuse_tex(2)
+        self.shader.set_specular_tex(2)
+        self.shader.set_ambient_tex(2)
         self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(1.0, 1.0, 1.0)
+        self.model_matrix.add_translation(5.0, 1.0, 1.0)
         self.model_matrix.add_scale(1.0, 1.0, 1.0)
         self.shader.set_model_matrix(self.model_matrix.matrix)
-        self.player.draw(self.shader)
+        self.mr_box.draw(self.shader)
         self.model_matrix.pop_matrix()
+        #
+        # self.shader.set_diffuse_tex(0)
+        # self.shader.set_specular_tex(0)
+        # self.shader.set_ambient_tex(0)
+        # self.model_matrix.push_matrix()
+        # self.model_matrix.add_translation(1.0, 1.0, 1.0)
+        # self.model_matrix.add_scale(1.0, 1.0, 1.0)
+        # self.shader.set_model_matrix(self.model_matrix.matrix)
+        # self.player.draw(self.shader)
+        # self.model_matrix.pop_matrix()
         #
         # self.model_matrix.push_matrix()
         # self.model_matrix.add_translation(4.0, 4.0, 4.0)
@@ -418,15 +421,13 @@ class FpsGame:
             self.shader.set_ambient_tex(0)
             self.model_matrix.push_matrix()
             self.model_matrix.add_translation(val["eye"].x, val["eye"].y, val["eye"].z)
-            # self.model_matrix.add_rotate_x(val["yAngle"])
             self.model_matrix.add_rotate_y(1.5708 + val["xzAngle"])
-            # self.model_matrix.add_rotate_z(val["yAngle"])
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
             self.shader.set_model_matrix(self.model_matrix.matrix)
             self.player.draw(self.shader)
             self.model_matrix.pop_matrix()
 
-        # /==/ Draw Hud /==/d
+        # /==/ Draw Hud /==/
         glDisable(GL_DEPTH_TEST)
         pygame.display.flip()
 
@@ -462,7 +463,6 @@ class FpsGame:
                             self.upwards = JUMP_POWER
                             self.jumping = True
 
-
                 elif event.type == pygame.KEYUP:
                     if event.key == W_KEY.key:
                         W_KEY.isPressed = False
@@ -479,6 +479,8 @@ class FpsGame:
 
                 elif event.type == pygame.MOUSEMOTION:
                     self.mouseMove = True
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    self.fireGun = True
                 else:
                     self.mouseMove = False
 

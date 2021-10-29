@@ -29,6 +29,9 @@ def load_obj_file(file_location, file_name):
     current_position_list = []
     current_normal_list = []
     current_uv_list = []
+    # /==/ For AABB /==/
+    vMax = Vector(0.0, 0.0, 0.0)
+    vMin = Vector(0.0, 0.0, 0.0)
     fin = open(file_location + "/" + file_name)
     for line in fin.readlines():
         tokens = line.split()
@@ -41,7 +44,16 @@ def load_obj_file(file_location, file_name):
             # we are starting a new object
             current_object_id = tokens[1]
         elif tokens[0] == "v":
-            current_position_list.append(Point(float(tokens[1]), float(tokens[2]), float(tokens[3])))
+            x, y, z = float(tokens[1]), float(tokens[2]), float(tokens[3])
+            # /==/ For AABB /==/
+            if x > vMax.x: vMax.x = x
+            if x < vMin.x: vMin.x = x
+            if y > vMax.y: vMax.y = y
+            if y < vMin.y: vMin.y = y
+            if z > vMax.z: vMax.z = z
+            if z < vMin.z: vMin.z = z
+            # /==/ Append to v /==/
+            current_position_list.append(Point(x, y, z))
         elif tokens[0] == "vn":
             current_normal_list.append(Vector(float(tokens[1]), float(tokens[2]), float(tokens[3])))
         elif tokens[0] == "vt":
@@ -64,6 +76,8 @@ def load_obj_file(file_location, file_name):
                 mesh_model.add_vertex(current_object_id, current_position_list[int(tokens[1][0])-1], current_normal_list[int(tokens[1][2])-1], current_uv_list[int(tokens[1][1])-1])
                 mesh_model.add_vertex(current_object_id, current_position_list[int(tokens[i+2][0])-1], current_normal_list[int(tokens[i+2][2])-1], current_uv_list[int(tokens[i+2][1])-1])
                 mesh_model.add_vertex(current_object_id, current_position_list[int(tokens[i+3][0])-1], current_normal_list[int(tokens[i+3][2])-1], current_uv_list[int(tokens[i+3][1])-1])
+    mesh_model.set_aabb(vMax, vMin)
+    print(mesh_model.aabb)
     # All models, vertices, and materials have been added to mesh_model, so set buffers
     mesh_model.set_opengl_buffers()
     return mesh_model

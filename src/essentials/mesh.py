@@ -2,6 +2,7 @@ import numpy as numpy
 
 from src.essentials.material import Material
 from OpenGL.GL import *
+from src.essentials.hitbox import HitboxAABB
 
 class Mesh:
     def __init__(self):
@@ -13,6 +14,7 @@ class Mesh:
         self.materialFile = ""
         self.vertex_counts = dict()
         self.vertexBufferIds = dict()
+        self.aabb = HitboxAABB()
 
     #def add_vertex(self, objectId, vertexList):
         #if objectId not in self.vertexArrays:

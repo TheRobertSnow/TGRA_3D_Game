@@ -1,6 +1,7 @@
 # https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 
 import math
+from src.essentials.vector import Vector
 
 
 class HitboxSphere:
@@ -35,14 +36,15 @@ class HitboxSphere:
 
 
 class HitboxAABB:
-    def __init__(self, position, width, height, depth):
-        self.position = position
-        self.minX = self.position.x - width*0.5
-        self.minY = self.position.y - height*0.5
-        self.minZ = self.position.z - depth*0.5
-        self.maxX = self.position.x + width*0.5
-        self.maxY = self.position.y + height*0.5
-        self.maxZ = self.position.z + depth*0.5
+    def __init__(self):
+        self.min = Vector(0.0, 0.0, 0.0)
+        self.max = Vector(0.0, 0.0, 0.0)
+
+    def set_max(self, max: Vector):
+        self.max = max
+
+    def set_min(self, min: Vector):
+        self.min = min
 
     def is_point_inside_aabb(self, point) -> bool:
         return ((point.x >= self.minX and point.x <= self.maxX) and
@@ -53,3 +55,10 @@ class HitboxAABB:
         return ((self.minX <= other.maxX and self.maxX >= other.minX) and
                 (self.minY <= other.maxY and self.maxY >= other.minY) and
                 (self.minZ <= other.maxZ and self.maxZ >= other.minZ))
+
+    def ray_intersects_aabb(self, ray) -> bool:
+        # max
+        return False
+
+    def __str__(self):
+        return "[" + str(self.max) + ", " + str(self.min) + "]"

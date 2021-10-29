@@ -1,6 +1,8 @@
 import numpy as numpy
 from OpenGL.GL import *
 
+from src.essentials.hitbox import HitboxAABB
+
 class MeshModel:
     def __init__(self):
         self.vertex_arrays = dict()
@@ -8,6 +10,7 @@ class MeshModel:
         self.materials = dict()
         self.vertex_counts = dict()
         self.vertex_buffer_ids = dict()
+        self.aabb = HitboxAABB()
 
     def add_vertex(self, mesh_id, position, normal, uv=None):
         if mesh_id not in self.vertex_arrays:
@@ -21,6 +24,10 @@ class MeshModel:
 
     def add_material(self, mat_id, mat):
         self.materials[mat_id] = mat
+
+    def set_aabb(self, vMax, vMin):
+        self.aabb.set_max(vMax)
+        self.aabb.set_min(vMin)
 
     # Makes buffers for each of the mesh id
     def set_opengl_buffers(self):

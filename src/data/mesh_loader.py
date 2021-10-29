@@ -44,12 +44,16 @@ def mtl_parser(fileName, name, mesh):
                 textureFile = temp[1]
     mesh.add_material(newmtl, shininess, ambiance, diffuse, specular, transparency, textureFile)
 
+
 def obj_parser(fLoc, fName):
     mesh = Mesh()
     v = []
     vt = []
     vn = []
     o = ""
+    # /==/ For AABB /==/
+    vMax = Vector(0.0, 0.0, 0.0)
+    vMin = Vector(0.0, 0.0, 0.0)
     #usemtl = ""
     with open(fLoc + "/" + fName, "r") as file:
         for line in file:
@@ -68,7 +72,16 @@ def obj_parser(fLoc, fName):
                     #usemtl = temp[1]
                 mesh.add_objectMaterial(o, temp[1])
             elif temp[0] == "v":
-                v.append(Point(float(temp[1]), float(temp[2]), float(temp[3])))
+                x, y, z = float(temp[1]), float[temp[2]], float[temp[3]]
+                # /==/ For AABB /==/
+                if x > vMax.x: vMax.x = x
+                if x < vMin.x: vMin.x = x
+                if y > vMax.y: vMax.y = y
+                if y < vMin.y: vMin.y = y
+                if z > vMax.z: vMax.z = z
+                if z < vMin.z: vMin.z = z
+                # /==/ Append to v /==/
+                v.append(Point(x, y, z))
             elif temp[0] == "vt":
                 vt.append(Vector(float(temp[1]), float(temp[2]), 0.0))
             elif temp[0] == "vn":
@@ -88,6 +101,7 @@ def obj_parser(fLoc, fName):
                     mesh.add_vertex(o, v[int(temp[i + 2][0]) - 1], vn[int(temp[i + 2][2]) - 1], vt[int(temp[i + 2][1]) - 1])
                     mesh.add_vertex(o, v[int(temp[i + 3][0]) - 1], vn[int(temp[i + 3][2]) - 1], vt[int(temp[i + 3][1]) - 1])
             mesh.set_opengl_buffers()
+        mesh.set_aabb
     return mesh
 
 def loadObj(fLoc, fName):
