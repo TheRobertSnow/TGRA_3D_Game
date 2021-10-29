@@ -42,9 +42,8 @@ class FpsGame:
         # /==/ Network Interface /==/
         self.netInterf = Interface()
         # self.netId = uuid.uuid1()
-        self.netId = "Rubs"
+        self.netId = "Daniel"
         self.xzAngle = 0.0
-        self.yAngle = 0.0
 
         # /==/ Mesh Loader /==/
         self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
@@ -77,6 +76,8 @@ class FpsGame:
         # /==/ Players /==/
         self.playerCharacter = Player()
         self.opponents = {}
+
+        self.bullets = []
 
         # /==/ Meshes /==/
         self.cube = Cube()
@@ -122,7 +123,6 @@ class FpsGame:
         netStr = str(self.netId) + ";"
         netStr += self.view_matrix.get_eye_str()
         netStr += str(self.xzAngle) + ";"
-        netStr += str(self.yAngle) + ";"
         return netStr
 
     # |===== Decode Net String =====|
@@ -136,8 +136,7 @@ class FpsGame:
             return
         self.opponents[temp[0]] = {
             "eye": Point(float(eyex), float(eyey), float(eyez)),
-            "xzAngle": float(temp[2]),
-            "yAngle": float(temp[3]),
+            "xzAngle": float(temp[2])
         }
 
 
@@ -151,6 +150,8 @@ class FpsGame:
         elif D_KEY.isPressed:
             return True
         elif self.jumping:
+            return True
+        elif self.mouseMove:
             return True
         else:
             return False
@@ -189,7 +190,7 @@ class FpsGame:
         if self.mouseMove:
             mouseXNew, mouseYNew = pygame.mouse.get_rel()
             mouseXNew = (mouseXNew / 25) * 15
-            self.xzAngle += mouseXNew
+            self.xzAngle += -mouseXNew * delta_time
             mouseYNew = (mouseYNew / 25) * 15
             if mouseXNew > 0:
                 self.view_matrix.yaw(-mouseXNew * delta_time)
@@ -415,15 +416,13 @@ class FpsGame:
             self.shader.set_ambient_tex(0)
             self.model_matrix.push_matrix()
             self.model_matrix.add_translation(val["eye"].x, val["eye"].y, val["eye"].z)
-            # self.model_matrix.add_rotate_x(val["u"].x)
-            self.model_matrix.add_rotate_y(val["xzAngle"])
-            # self.model_matrix.add_rotate_z(val["n"].z)
+            self.model_matrix.add_rotate_y(1.5708 + val["xzAngle"])
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
             self.shader.set_model_matrix(self.model_matrix.matrix)
             self.player.draw(self.shader)
             self.model_matrix.pop_matrix()
 
-        # /==/ Draw Hud /==/d
+        # /==/ Draw Hud /==/
         glDisable(GL_DEPTH_TEST)
         pygame.display.flip()
 
@@ -459,7 +458,6 @@ class FpsGame:
                             self.upwards = JUMP_POWER
                             self.jumping = True
 
-
                 elif event.type == pygame.KEYUP:
                     if event.key == W_KEY.key:
                         W_KEY.isPressed = False
@@ -476,6 +474,9 @@ class FpsGame:
 
                 elif event.type == pygame.MOUSEMOTION:
                     self.mouseMove = True
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    #Left click
+                    print("Do bullet shit")
                 else:
                     self.mouseMove = False
 

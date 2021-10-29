@@ -96,10 +96,10 @@ class Cube:
         glDrawArrays(GL_TRIANGLE_FAN, 12, 4);
         glDrawArrays(GL_TRIANGLE_FAN, 16, 4);
         glDrawArrays(GL_TRIANGLE_FAN, 20, 4);
-        #glDrawArrays(GL_TRIANGLE_FAN, 24, 4)
-        #glDrawArrays(GL_TRIANGLE_FAN, 28, 4)
-        #glDrawArrays(GL_TRIANGLE_FAN, 32, 4)
-        #glDrawArrays(GL_TRIANGLE_FAN, 36, 4)
+        glDrawArrays(GL_TRIANGLE_FAN, 24, 4)
+        glDrawArrays(GL_TRIANGLE_FAN, 28, 4)
+        glDrawArrays(GL_TRIANGLE_FAN, 32, 4)
+        glDrawArrays(GL_TRIANGLE_FAN, 36, 4)
 
 
 class Sphere:
