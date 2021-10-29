@@ -138,8 +138,9 @@ class FpsGame:
             if mouseYNew < 0:
                 self.view_matrix.pitch(-mouseYNew * delta_time)
 
-        self.netInterf.send("U r gay")
-        print(self.netInterf.recv())
+        if self.netInterf.isAvailable:
+            self.netInterf.send("U r gay")
+            print(self.netInterf.recv())
 
     # |===== DISPLAY =====|
     def display(self):

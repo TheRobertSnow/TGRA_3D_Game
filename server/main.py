@@ -50,12 +50,15 @@ class Server:
         if mask & selectors.EVENT_WRITE:
             if data.outb:
                 print('echoing', repr(data.outb), 'to', data.addr)
-                sent = sock.send(data.outb)  # Should be ready to write
-                data.outb = data.outb[sent:]
+                # sent = sock.send(data.outb)  # Should be ready to write
+                # data.outb = data.outb[sent:]
+                self.forward(data, sock)
 
-    def forward(self, msg):
+    def forward(self, msg, sock):
         # TODO: Forward the message to all other clients but the sender
-        pass
+        for s in self.clientList:
+            if s != sock:
+                s.send(msg.outb)
 
 
 if __name__ == "__main__":
