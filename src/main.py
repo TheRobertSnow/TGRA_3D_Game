@@ -123,9 +123,12 @@ class FpsGame:
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         temp = netStr.split(";")
-        self.opponents[temp[0]]
-        x, y, z = temp[1].split(',')
-        self.opponents[temp[0]]["eye"] = Point(float(x), float(y), float(z))
+        try:
+            x, y, z = temp[1].split(',')
+        except ValueError:
+            print("ERROR")
+            return
+        self.opponents[temp[0]] = {"eye": Point(float(x), float(y), float(z))}
 
     def check_if_player_moving(self):
         if W_KEY.isPressed:
@@ -174,8 +177,8 @@ class FpsGame:
 
         if self.mouseMove:
             mouseXNew, mouseYNew = pygame.mouse.get_rel()
-            mouseXNew = (mouseXNew / 25) * 4
-            mouseYNew = (mouseYNew / 25) * 4
+            mouseXNew = (mouseXNew / 25) * 15
+            mouseYNew = (mouseYNew / 25) * 15
             if mouseXNew > 0:
                 self.view_matrix.yaw(-mouseXNew * delta_time)
             if mouseXNew < 0:
@@ -192,7 +195,6 @@ class FpsGame:
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
             recvString = self.netInterf.recv()
-            print(recvString)
             if recvString != "":
                 self.decode_net_str(recvString)
                 print(self.opponents)
