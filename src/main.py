@@ -41,7 +41,8 @@ class FpsGame:
 
         # /==/ Network Interface /==/
         self.netInterf = Interface()
-        self.netId = uuid.uuid1()
+        # self.netId = uuid.uuid1()
+        self.netId = "Rubs"
 
         # /==/ Mesh Loader /==/
         self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
@@ -123,6 +124,7 @@ class FpsGame:
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         temp = netStr.split(";")
+        print("Temp: ", temp)
         try:
             x, y, z = temp[1].split(',')
         except ValueError:
@@ -191,9 +193,11 @@ class FpsGame:
         if self.netInterf.isAvailable:
             if self.check_if_player_moving():
                 t1 = time.process_time() - self.t0
-                if t1 >= 0.2:
+                if t1 >= 0.01:
+                    print(t1)
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
+
             recvString = self.netInterf.recv()
             if recvString != "":
                 self.decode_net_str(recvString)
@@ -418,13 +422,11 @@ class FpsGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     print("Quitting!")
-                    self.netInterf.send("Im closing connection")
                     self.netInterf.closeSock()
                     exiting = True
                 elif event.type == pygame.KEYDOWN:
                     if event.key == K_ESCAPE:
                         print("Escaping!")
-                        self.netInterf.send("Im closing connection")
                         self.netInterf.closeSock()
                         exiting = True
 
