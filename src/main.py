@@ -18,16 +18,9 @@ from src.essentials.settings import *
 from src.essentials.base_3d_objects import *
 from src.essentials.color import Color
 from src.data.level_loader import *
-<<<<<<< HEAD
-from src.data.mesh_loader import *
-from src.player.player import Player
 from src.network.interface import Interface
-=======
-from src.data.types.player import *
 from src.data import kari_loader
-#from src.player.player import Player
->>>>>>> 1122f4696c71a861227deca37d069cdfe4982317
-
+from src.player.player import *
 
 # |===== MAIN PROGRAM CLASS =====|
 class FpsGame:
@@ -45,28 +38,19 @@ class FpsGame:
         self.startPoint = self.levelLoader.startPoint
         self.endPoint = self.levelLoader.endPoint
 
-<<<<<<< HEAD
-        # /==/ Mesh Loader /==/
-        self.player = MeshLoader()
-        self.player.loadObj(sys.path[0] + "/src/assets/meshes/player/jeff.obj")
-        print(self.player.v)
-        print(len(self.player.v))
-        print(self.player.vn)
-        print(len(self.player.vn))
-        print(len(self.player.vt))
-
-        # /==/ Netwrok Interface /==/
+        # /==/ Network Interface /==/
         self.netInterf = Interface()
-=======
+
+        # /==/ Mesh Loader /==/
         self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
         self.mr_box = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/mr_box", "mr_box.obj")
         self.cent = kari_loader.load_obj_file(sys.path[0] + "/src/data/objects", "cent.obj")
         self.soldier = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/soldier", "dusty_2.obj")
 
+        # /==/ Texture Loader /==/
         self.texture_0 = self.load_texture("/src/assets/meshes/player/jeff.png")
         self.texture_1 = self.load_texture("/src/assets/meshes/mr_box/box.png")
         self.texture_2 = self.load_texture("/src/assets/meshes/bricks.jpg")
->>>>>>> 1122f4696c71a861227deca37d069cdfe4982317
 
         # /==/ Shaders /==/
         self.shader = Shader3D()
@@ -366,29 +350,8 @@ class FpsGame:
         self.cube.draw(self.shader)
         self.model_matrix.pop_matrix()
 
-        # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-<<<<<<< HEAD
-        # glBegin(GL_TRIANGLES)
-        # for index in self.player.f:
-        #     for f in index:
-        #         vertex = self.player.v[int(f[0])]
-        #         texture = self.player.vt[int(f[1])]
-        #         normal = self.player.vn[int(f[2])]
-        #         #if int(f) % 3 == 1:
-        #             #glColor4f(0.282, 0.239, 0.545, 0.35)
-        #         #elif int(f) % 3 == 2:w
-        #             #glColor4f(0.729, 0.333, 0.827, 0.35)
-        #         #else:
-        #             #glColor4f(0.545, 0.000, 0.545, 0.35)
-        #         glVertex3fv(vertex)
-        # glEnd()
-        # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-
         # /==/ Draw Hud /==/
         glDisable(GL_DEPTH_TEST)
-
-=======
->>>>>>> 1122f4696c71a861227deca37d069cdfe4982317
         pygame.display.flip()
 
     # |===== MAIN PROGRAM FUNCTION =====|
