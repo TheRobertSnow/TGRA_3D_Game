@@ -83,6 +83,8 @@ class FpsGame:
         self.clock = pygame.time.Clock()
         self.clock.tick()
 
+        self.t0 = time.process_time()
+
         # /==/ Init Input /==/
         # Hide the mouse cursor
         pygame.mouse.set_visible(False)
@@ -184,8 +186,14 @@ class FpsGame:
 
         if self.netInterf.isAvailable:
             if self.check_if_player_moving():
-                self.netInterf.send(self.create_net_str())
+                t1 = time.process_time() - self.t0
+                if t1 >= 0.2:
+                    self.t0 = time.process_time()
+                    self.netInterf.send(self.create_net_str())
             print(self.netInterf.recv())
+            if self.netInterf.recv() != "":
+                self.decode_net_str(self.netInterf.recv())
+                print(self.opponents)
 
     # |===== DISPLAY =====|
     def display(self):
