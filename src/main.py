@@ -9,6 +9,7 @@ from math import *
 import pygame
 from pygame.locals import *
 
+import uuid
 import sys
 import time
 
@@ -40,6 +41,7 @@ class FpsGame:
 
         # /==/ Network Interface /==/
         self.netInterf = Interface()
+        self.netId = uuid.uuid1()
 
         # /==/ Mesh Loader /==/
         self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
@@ -71,7 +73,7 @@ class FpsGame:
 
         # /==/ Players /==/
         self.playerCharacter = Player()
-        self.opponents = []
+        self.opponents = dict()
 
         # /==/ Meshes /==/
         self.cube = Cube()
@@ -108,6 +110,34 @@ class FpsGame:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
         return tex_id
+
+
+    # |===== Create Network Str =====|
+    def create_net_str(self):
+        netStr = str(self.netId) + ";"
+        netStr += self.view_matrix.get_eye_str()
+        return netStr
+
+    # |===== Decode Net String =====|
+    def decode_net_str(self, netStr):
+        temp = netStr.split(";")
+        x, y, z = temp[1].split(',')
+        self.opponents[temp[0]]["eye"] = Point(float(x), float(y), float(z))
+
+    def check_if_player_moving(self):
+        if W_KEY.isPressed:
+            return True
+        elif A_KEY.isPressed:
+            return True
+        elif S_KEY.isPressed:
+            return True
+        elif D_KEY.isPressed:
+            return True
+        elif self.jumping:
+            return True
+        else:
+            return False
+
 
     # |===== UPDATE =====|
     def update(self):
@@ -153,7 +183,8 @@ class FpsGame:
                 self.view_matrix.pitch(-mouseYNew * delta_time)
 
         if self.netInterf.isAvailable:
-            self.netInterf.send("U r gay")
+            if self.check_if_player_moving():
+                self.netInterf.send(self.create_net_str())
             print(self.netInterf.recv())
 
     # |===== DISPLAY =====|
@@ -292,30 +323,30 @@ class FpsGame:
         # self.cube.draw(self.shader)
         # self.model_matrix.pop_matrix()
 
-        self.shader.set_diffuse_tex(1)
-        self.shader.set_specular_tex(1)
-        self.shader.set_ambient_tex(1)
-        self.shader.set_material_diffuse(Color(0.8, 0.2, 0.8))
-        self.shader.set_material_ambient(Color(1.0, 0.0, 1.0))
-        self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(0.0, 0.0, -3.0)
-        self.model_matrix.add_rotate_x(self.angle * 0.4)
-        self.model_matrix.add_rotate_y(self.angle * 0.2)
-        self.model_matrix.add_scale(0.5, 0.5, 0.5)
-        self.shader.set_model_matrix(self.model_matrix.matrix)
-        self.cube.draw(self.shader)
-        self.model_matrix.pop_matrix()
-
-        self.shader.set_diffuse_tex(2)
-        self.shader.set_specular_tex(2)
-        self.shader.set_ambient_tex(2)
-        self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(5.0, 1.0, 1.0)
-        self.model_matrix.add_scale(1.0, 1.0, 1.0)
-        self.shader.set_model_matrix(self.model_matrix.matrix)
-        self.mr_box.draw(self.shader)
-        self.model_matrix.pop_matrix()
-
+        # self.shader.set_diffuse_tex(1)
+        # self.shader.set_specular_tex(1)
+        # self.shader.set_ambient_tex(1)
+        # self.shader.set_material_diffuse(Color(0.8, 0.2, 0.8))
+        # self.shader.set_material_ambient(Color(1.0, 0.0, 1.0))
+        # self.model_matrix.push_matrix()
+        # self.model_matrix.add_translation(0.0, 0.0, -3.0)
+        # self.model_matrix.add_rotate_x(self.angle * 0.4)
+        # self.model_matrix.add_rotate_y(self.angle * 0.2)
+        # self.model_matrix.add_scale(0.5, 0.5, 0.5)
+        # self.shader.set_model_matrix(self.model_matrix.matrix)
+        # self.cube.draw(self.shader)
+        # self.model_matrix.pop_matrix()
+        #
+        # self.shader.set_diffuse_tex(2)
+        # self.shader.set_specular_tex(2)
+        # self.shader.set_ambient_tex(2)
+        # self.model_matrix.push_matrix()
+        # self.model_matrix.add_translation(5.0, 1.0, 1.0)
+        # self.model_matrix.add_scale(1.0, 1.0, 1.0)
+        # self.shader.set_model_matrix(self.model_matrix.matrix)
+        # self.mr_box.draw(self.shader)
+        # self.model_matrix.pop_matrix()
+        #
         self.shader.set_diffuse_tex(0)
         self.shader.set_specular_tex(0)
         self.shader.set_ambient_tex(0)
@@ -325,31 +356,43 @@ class FpsGame:
         self.shader.set_model_matrix(self.model_matrix.matrix)
         self.player.draw(self.shader)
         self.model_matrix.pop_matrix()
+        #
+        # self.model_matrix.push_matrix()
+        # self.model_matrix.add_translation(4.0, 4.0, 4.0)
+        # self.model_matrix.add_scale(0.1, 0.1, 0.1)
+        # self.shader.set_model_matrix(self.model_matrix.matrix)
+        # self.cent.draw(self.shader)
+        # self.model_matrix.pop_matrix()
+        #
+        # self.model_matrix.push_matrix()
+        # self.model_matrix.add_translation(0.0, 0.0, 4.0)
+        # self.model_matrix.add_scale(0.001, 0.001, 0.001)
+        # self.shader.set_model_matrix(self.model_matrix.matrix)
+        # self.soldier.draw(self.shader)
+        # self.model_matrix.pop_matrix()
+        #
+        # self.shader.set_diffuse_tex(1)
+        # self.shader.set_specular_tex(1)
+        # self.shader.set_ambient_tex(1)
+        # self.model_matrix.push_matrix()
+        # self.model_matrix.add_translation(0.0, 0.0, -3.0)
+        # self.model_matrix.add_rotate_x(self.angle * 0.4)
+        # self.model_matrix.add_scale(1.0, 1.0, 1.0)
+        # self.shader.set_model_matrix(self.model_matrix.matrix)
+        # self.cube.draw(self.shader)
+        # self.model_matrix.pop_matrix()
 
-        self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(4.0, 4.0, 4.0)
-        self.model_matrix.add_scale(0.1, 0.1, 0.1)
-        self.shader.set_model_matrix(self.model_matrix.matrix)
-        self.cent.draw(self.shader)
-        self.model_matrix.pop_matrix()
-
-        self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(0.0, 0.0, 4.0)
-        self.model_matrix.add_scale(0.001, 0.001, 0.001)
-        self.shader.set_model_matrix(self.model_matrix.matrix)
-        self.soldier.draw(self.shader)
-        self.model_matrix.pop_matrix()
-
-        self.shader.set_diffuse_tex(1)
-        self.shader.set_specular_tex(1)
-        self.shader.set_ambient_tex(1)
-        self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(0.0, 0.0, -3.0)
-        self.model_matrix.add_rotate_x(self.angle * 0.4)
-        self.model_matrix.add_scale(1.0, 1.0, 1.0)
-        self.shader.set_model_matrix(self.model_matrix.matrix)
-        self.cube.draw(self.shader)
-        self.model_matrix.pop_matrix()
+        # /==/ Draw Opponents /==/
+        for key, val in self.opponents.items():
+            self.shader.set_diffuse_tex(0)
+            self.shader.set_specular_tex(0)
+            self.shader.set_ambient_tex(0)
+            self.model_matrix.push_matrix()
+            self.model_matrix.add_translation(val["eye"].x, val["eye"].y, val["eye"].z)
+            self.model_matrix.add_scale(1.0, 1.0, 1.0)
+            self.shader.set_model_matrix(self.model_matrix.matrix)
+            self.player.draw(self.shader)
+            self.model_matrix.pop_matrix()
 
         # /==/ Draw Hud /==/
         glDisable(GL_DEPTH_TEST)
