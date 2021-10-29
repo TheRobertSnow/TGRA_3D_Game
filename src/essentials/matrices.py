@@ -198,6 +198,15 @@ class ViewMatrix:
     def get_eye_str(self):
         return str(self.eye.x) + ",0.0," + str(self.eye.z) + ";"
 
+    def get_u_str(self):
+        return str(self.u.x) + "," + str(self.u.y) + "," + str(self.u.z) + ";"
+
+    def get_v_str(self):
+        return str(self.v.x) + "," + str(self.v.y) + "," + str(self.v.z) + ";"
+
+    def get_n_str(self):
+        return str(self.n.x) + "," + str(self.n.y) + "," + str(self.n.z) + ";"
+
 
 # The ProjectionMatrix class builds transformations concerning
 # the camera's "lens"

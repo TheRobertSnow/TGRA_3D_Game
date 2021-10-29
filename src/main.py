@@ -41,7 +41,8 @@ class FpsGame:
 
         # /==/ Network Interface /==/
         self.netInterf = Interface()
-        self.netId = uuid.uuid1()
+        #self.netId = uuid.uuid1()
+        self.netId = "Daniel"
 
         # /==/ Mesh Loader /==/
         self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
@@ -118,17 +119,29 @@ class FpsGame:
     def create_net_str(self):
         netStr = str(self.netId) + ";"
         netStr += self.view_matrix.get_eye_str()
+        netStr += self.view_matrix.get_u_str()
+        netStr += self.view_matrix.get_v_str()
+        netStr += self.view_matrix.get_n_str()
         return netStr
 
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         temp = netStr.split(";")
         try:
-            x, y, z = temp[1].split(',')
+            eyex, eyey, eyez = temp[1].split(',')
+            ux, uy, uz = temp[2].split(',')
+            vx, vy, vz = temp[3].split(',')
+            nx, ny, nz = temp[4].split(',')
         except ValueError:
             print("ERROR")
             return
-        self.opponents[temp[0]] = {"eye": Point(float(x), float(y), float(z))}
+        self.opponents[temp[0]] = {
+            "eye": Point(float(eyex), float(eyey), float(eyez)),
+            "u": Vector(float(ux), float(uy), float(uz)),
+            "v": Vector(float(vx), float(vy), float(vz)),
+            "n": Vector(float(nx), float(ny), float(nz)),
+        }
+
 
     def check_if_player_moving(self):
         if W_KEY.isPressed:
@@ -177,8 +190,8 @@ class FpsGame:
 
         if self.mouseMove:
             mouseXNew, mouseYNew = pygame.mouse.get_rel()
-            mouseXNew = (mouseXNew / 25) * 4
-            mouseYNew = (mouseYNew / 25) * 4
+            mouseXNew = (mouseXNew / 25) * 15
+            mouseYNew = (mouseYNew / 25) * 15
             if mouseXNew > 0:
                 self.view_matrix.yaw(-mouseXNew * delta_time)
             if mouseXNew < 0:
@@ -191,13 +204,12 @@ class FpsGame:
         if self.netInterf.isAvailable:
             if self.check_if_player_moving():
                 t1 = time.process_time() - self.t0
-                if t1 >= 0.2:
+                if t1 >= 0.01:
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
             recvString = self.netInterf.recv()
             if recvString != "":
                 self.decode_net_str(recvString)
-                print(self.opponents)
 
     # |===== DISPLAY =====|
     def display(self):
@@ -401,12 +413,15 @@ class FpsGame:
             self.shader.set_ambient_tex(0)
             self.model_matrix.push_matrix()
             self.model_matrix.add_translation(val["eye"].x, val["eye"].y, val["eye"].z)
+            self.model_matrix.add_rotate_x(val["u"].x)
+            self.model_matrix.add_rotate_y(val["v"].y)
+            self.model_matrix.add_rotate_z(val["n"].z)
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
             self.shader.set_model_matrix(self.model_matrix.matrix)
             self.player.draw(self.shader)
             self.model_matrix.pop_matrix()
 
-        # /==/ Draw Hud /==/
+        # /==/ Draw Hud /==/d
         glDisable(GL_DEPTH_TEST)
         pygame.display.flip()
 
@@ -418,13 +433,11 @@ class FpsGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     print("Quitting!")
-                    self.netInterf.send("Im closing connection")
                     self.netInterf.closeSock()
                     exiting = True
                 elif event.type == pygame.KEYDOWN:
                     if event.key == K_ESCAPE:
                         print("Escaping!")
-                        self.netInterf.send("Im closing connection")
                         self.netInterf.closeSock()
                         exiting = True
 
