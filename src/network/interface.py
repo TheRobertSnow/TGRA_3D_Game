@@ -33,7 +33,7 @@ class Interface:
     def recv(self):
         try:
             data = self.sock.recv(1024)
-            return repr(data)
+            return data.decode("utf-8")
         except BlockingIOError:
             return ""
         except OSError:
