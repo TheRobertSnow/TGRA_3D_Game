@@ -122,7 +122,7 @@ class FpsGame:
         netStr = str(self.netId) + ";"
         netStr += self.view_matrix.get_eye_str()
         netStr += str(self.xzAngle) + ";"
-        netStr += str(self.yAngle) + ";"
+        # netStr += str(self.yAngle) + ";"
         return netStr
 
     # |===== Decode Net String =====|
@@ -137,7 +137,7 @@ class FpsGame:
         self.opponents[temp[0]] = {
             "eye": Point(float(eyex), float(eyey), float(eyez)),
             "xzAngle": float(temp[2]),
-            "yAngle": float(temp[3]),
+            # "yAngle": float(temp[3]),
         }
 
 
@@ -151,6 +151,8 @@ class FpsGame:
         elif D_KEY.isPressed:
             return True
         elif self.jumping:
+            return True
+        elif self.mouseMove:
             return True
         else:
             return False
@@ -189,8 +191,9 @@ class FpsGame:
         if self.mouseMove:
             mouseXNew, mouseYNew = pygame.mouse.get_rel()
             mouseXNew = (mouseXNew / 25) * 15
-            self.xzAngle += mouseXNew
+            self.xzAngle += -mouseXNew * delta_time
             mouseYNew = (mouseYNew / 25) * 15
+            self.yAngle += -mouseYNew * delta_time
             if mouseXNew > 0:
                 self.view_matrix.yaw(-mouseXNew * delta_time)
             if mouseXNew < 0:
@@ -415,9 +418,9 @@ class FpsGame:
             self.shader.set_ambient_tex(0)
             self.model_matrix.push_matrix()
             self.model_matrix.add_translation(val["eye"].x, val["eye"].y, val["eye"].z)
-            # self.model_matrix.add_rotate_x(val["u"].x)
-            self.model_matrix.add_rotate_y(val["xzAngle"])
-            # self.model_matrix.add_rotate_z(val["n"].z)
+            # self.model_matrix.add_rotate_x(val["yAngle"])
+            self.model_matrix.add_rotate_y(1.5708 + val["xzAngle"])
+            # self.model_matrix.add_rotate_z(val["yAngle"])
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
             self.shader.set_model_matrix(self.model_matrix.matrix)
             self.player.draw(self.shader)
