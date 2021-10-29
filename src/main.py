@@ -50,9 +50,11 @@ class FpsGame:
         self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
         self.mr_box = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/mr_box", "mr_box.obj")
         self.cent = kari_loader.load_obj_file(sys.path[0] + "/src/data/objects", "cent.obj")
+        self.soldier = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/soldier", "dusty_2.obj")
 
         self.texture_0 = self.load_texture("/src/assets/meshes/player/jeff.png")
         self.texture_1 = self.load_texture("/src/assets/meshes/mr_box/box.png")
+        self.texture_2 = self.load_texture("/src/assets/meshes/bricks.jpg")
 
         self.shader = Shader3D()
         self.shader.use()
@@ -163,6 +165,8 @@ class FpsGame:
         glBindTexture(GL_TEXTURE_2D, self.texture_0)
         glActiveTexture(GL_TEXTURE1)
         glBindTexture(GL_TEXTURE_2D, self.texture_1)
+        glActiveTexture(GL_TEXTURE2)
+        glBindTexture(GL_TEXTURE_2D, self.texture_2)
 
         # self.cube.set_vertices(self.shader)
         #
@@ -237,9 +241,9 @@ class FpsGame:
         # Good for working with hitbox
         # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
-        self.shader.set_diffuse_tex(0)
-        self.shader.set_specular_tex(0)
-        self.shader.set_ambient_tex(0)
+        self.shader.set_diffuse_tex(2)
+        self.shader.set_specular_tex(2)
+        self.shader.set_ambient_tex(2)
         self.shader.set_material_diffuse(Color(0.8, 0.8, 0.2))
         self.shader.set_material_ambient(Color(1.0, 1.0, 0.0))
         self.model_matrix.push_matrix()
@@ -280,9 +284,9 @@ class FpsGame:
         self.cube.draw(self.shader)
         self.model_matrix.pop_matrix()
 
-        self.shader.set_diffuse_tex(1)
-        self.shader.set_specular_tex(1)
-        self.shader.set_ambient_tex(1)
+        self.shader.set_diffuse_tex(2)
+        self.shader.set_specular_tex(2)
+        self.shader.set_ambient_tex(2)
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(5.0, 1.0, 1.0)
         self.model_matrix.add_scale(1.0, 1.0, 1.0)
@@ -305,6 +309,24 @@ class FpsGame:
         self.model_matrix.add_scale(0.1, 0.1, 0.1)
         self.shader.set_model_matrix(self.model_matrix.matrix)
         self.cent.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(0.0, 0.0, 4.0)
+        self.model_matrix.add_scale(0.001, 0.001, 0.001)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.soldier.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+        self.shader.set_diffuse_tex(1)
+        self.shader.set_specular_tex(1)
+        self.shader.set_ambient_tex(1)
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(0.0, 0.0, -3.0)
+        self.model_matrix.add_rotate_x(self.angle * 0.4)
+        self.model_matrix.add_scale(1.0, 1.0, 1.0)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.cube.draw(self.shader)
         self.model_matrix.pop_matrix()
 
         # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
