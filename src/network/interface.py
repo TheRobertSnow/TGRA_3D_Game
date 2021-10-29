@@ -7,7 +7,7 @@ from src.essentials.settings import *
 
 from socket import *
 
-IP_ADDR = "127.0.0.1"
+IP_ADDR = "157.97.11.131"
 PORT = 6969 #Nice
 
 class Interface:
@@ -39,6 +39,9 @@ class Interface:
         except OSError:
             self.isAvailable = False
             return ""
+
+    def closeSock(self):
+        self.sock.close()
 
 if __name__ == "__main__":
     net = Interface()

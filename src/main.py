@@ -363,12 +363,15 @@ class FpsGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     print("Quitting!")
+                    self.netInterf.send("Im closing connection")
+                    self.netInterf.closeSock()
                     exiting = True
                 elif event.type == pygame.KEYDOWN:
                     if event.key == K_ESCAPE:
                         print("Escaping!")
+                        self.netInterf.send("Im closing connection")
+                        self.netInterf.closeSock()
                         exiting = True
-
 
                     if event.key == W_KEY.key:
                         W_KEY.isPressed = True
