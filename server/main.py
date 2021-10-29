@@ -2,7 +2,7 @@ import selectors
 import types
 from socket import *
 
-IP_ADDR = "127.0.0.1"
+IP_ADDR = "10.1.116.141"
 PORT = 6969
 
 class Server:
@@ -46,6 +46,7 @@ class Server:
             else:
                 print('closing connection to', data.addr)
                 self.sel.unregister(sock)
+                self.clientList.remove(sock)
                 sock.close()
         if mask & selectors.EVENT_WRITE:
             if data.outb:
@@ -57,8 +58,13 @@ class Server:
     def forward(self, msg, sock):
         # TODO: Forward the message to all other clients but the sender
         for s in self.clientList:
+            print(type(s))
             if s != sock:
-                s.send(msg.outb)
+                try:
+                    s.send(msg.outb)
+                except BlockingIOError:
+                    print("Could not send")
+
 
 
 if __name__ == "__main__":

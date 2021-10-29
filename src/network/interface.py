@@ -7,7 +7,7 @@ from src.essentials.settings import *
 
 from socket import *
 
-IP_ADDR = "127.0.0.1"
+IP_ADDR = "10.1.116.141"
 PORT = 6969 #Nice
 
 class Interface:
