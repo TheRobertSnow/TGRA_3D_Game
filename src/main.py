@@ -73,7 +73,7 @@ class FpsGame:
 
         # /==/ Players /==/
         self.playerCharacter = Player()
-        self.opponents = dict()
+        self.opponents = {}
 
         # /==/ Meshes /==/
         self.cube = Cube()
@@ -123,8 +123,12 @@ class FpsGame:
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         temp = netStr.split(";")
-        x, y, z = temp[1].split(',')
-        self.opponents[temp[0]]["eye"] = Point(float(x), float(y), float(z))
+        try:
+            x, y, z = temp[1].split(',')
+        except ValueError:
+            print("ERROR")
+            return
+        self.opponents[temp[0]] = {"eye": Point(float(x), float(y), float(z))}
 
     def check_if_player_moving(self):
         if W_KEY.isPressed:
@@ -190,9 +194,9 @@ class FpsGame:
                 if t1 >= 0.2:
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
-            print(self.netInterf.recv())
-            if self.netInterf.recv() != "":
-                self.decode_net_str(self.netInterf.recv())
+            recvString = self.netInterf.recv()
+            if recvString != "":
+                self.decode_net_str(recvString)
                 print(self.opponents)
 
     # |===== DISPLAY =====|
