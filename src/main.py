@@ -67,11 +67,16 @@ class FpsGame:
         self.view_matrix = ViewMatrix()
         self.view_matrix.look(Point(1, 1.8, 0), Point(0, 0, 0), Vector(0, 1, 0))
 
+        self.view_matrix2 = ViewMatrix()
+        self.view_matrix2.look(Point(0.01, 0, 0), Point(0, 0, 0), Vector(0, 0.01, 0))
+
         # /==/ Projection Matrix /==/
         self.projection_matrix = ProjectionMatrix()
-        # self.projection_matrix.set_orthographic(-2, 2, -2, 2, 0.5, 100)
         self.projection_matrix.set_perspective(pi / 2, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.1, 100)
-        self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
+
+        self.projection_matrix2 = ProjectionMatrix()
+        #self.projection_matrix2.set_orthographic(-2, 2, -2, 2, 0.5, 100)
+        self.projection_matrix2.set_perspective(pi / 2, 150 / 150, 0.1, 100)
 
         # /==/ Players /==/
         self.playerCharacter = Player()
@@ -230,11 +235,10 @@ class FpsGame:
 
         glClearColor(0.78, 1.0, 1.0, 1.0)
 
-        self.projection_matrix.set_perspective(pi / 2, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.1, 100)
+        self.shader.set_view_matrix(self.view_matrix.get_matrix())
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
         self.shader.set_eye_position(self.view_matrix.eye)
         self.model_matrix.load_identity()
-        self.shader.set_view_matrix(self.view_matrix.get_matrix())
 
         light_pos = [(21.0, 10.0, 1.75, 1.0), (-21.0, 1.5, 1.75, 1.0), (0.0, 1.5, 1.75, 1.0)]
         light_dif = [(1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0)]
@@ -247,12 +251,6 @@ class FpsGame:
         self.shader.set_light_ambient(light_amb)
         self.shader.set_global_ambient(0.2, 0.2, 0.2)
 
-        glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, self.texture_0)
-        glActiveTexture(GL_TEXTURE1)
-        glBindTexture(GL_TEXTURE_2D, self.texture_1)
-        glActiveTexture(GL_TEXTURE2)
-        glBindTexture(GL_TEXTURE_2D, self.texture_2)
 
         self.cube.set_vertices(self.shader)
 
@@ -327,9 +325,10 @@ class FpsGame:
         # Good for working with hitbox
         # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
-        self.shader.set_diffuse_tex(2)
-        self.shader.set_specular_tex(2)
-        self.shader.set_ambient_tex(2)
+        glBindTexture(GL_TEXTURE_2D, self.texture_2)
+        #self.shader.set_diffuse_tex(2)
+        #self.shader.set_specular_tex(2)
+        #self.shader.set_ambient_tex(2)
         self.shader.set_material_diffuse(Color(0.8, 0.8, 0.2))
         self.shader.set_material_ambient(Color(1.0, 1.0, 0.0))
         self.model_matrix.push_matrix()
@@ -370,9 +369,10 @@ class FpsGame:
         # self.cube.draw(self.shader)
         # self.model_matrix.pop_matrix()
         #
-        self.shader.set_diffuse_tex(2)
-        self.shader.set_specular_tex(2)
-        self.shader.set_ambient_tex(2)
+        glBindTexture(GL_TEXTURE_2D, self.texture_2)
+        #self.shader.set_diffuse_tex(2)
+        #self.shader.set_specular_tex(2)
+        #self.shader.set_ambient_tex(2)
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(5.0, 1.0, 1.0)
         self.model_matrix.add_scale(1.0, 1.0, 1.0)
@@ -381,9 +381,10 @@ class FpsGame:
         self.model_matrix.pop_matrix()
 
         if not self.player.isHit:
-            self.shader.set_diffuse_tex(0)
-            self.shader.set_specular_tex(0)
-            self.shader.set_ambient_tex(0)
+            glBindTexture(GL_TEXTURE_2D, self.texture_0)
+            #self.shader.set_diffuse_tex(0)
+            #self.shader.set_specular_tex(0)
+            #self.shader.set_ambient_tex(0)
             self.model_matrix.push_matrix()
             self.model_matrix.add_translation(1.0, 1.0, 1.0)
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
@@ -419,9 +420,10 @@ class FpsGame:
 
         # /==/ Draw Opponents /==/
         for key, val in self.opponents.items():
-            self.shader.set_diffuse_tex(0)
-            self.shader.set_specular_tex(0)
-            self.shader.set_ambient_tex(0)
+            #self.shader.set_diffuse_tex(0)
+            #self.shader.set_specular_tex(0)
+            #self.shader.set_ambient_tex(0)
+            glBindTexture(GL_TEXTURE_2D, self.texture_0)
             self.model_matrix.push_matrix()
             self.model_matrix.add_translation(val["eye"].x, val["eye"].y, val["eye"].z)
             self.model_matrix.add_rotate_y(1.5708 + val["xzAngle"])
@@ -433,6 +435,37 @@ class FpsGame:
 
         # /==/ Draw Hud /==/
         glDisable(GL_DEPTH_TEST)
+        glClear(GL_DEPTH_BUFFER_BIT)
+        glViewport(0, 0, 50, 200)  # Top Down ViewPort
+        glClearColor(0.78, 1.0, 1.0, 1.0)
+        self.shader.set_view_matrix(self.view_matrix2.get_matrix())
+        self.shader.set_projection_matrix(self.projection_matrix2.get_matrix())
+        self.model_matrix.load_identity()
+
+        # teikna ehvskonar kassa sem er misstór eftir health
+        glBindTexture(GL_TEXTURE_2D, self.texture_2)
+        self.shader.set_material_diffuse(Color(0.0, 0.0, 0.0))
+        self.shader.set_material_ambient(Color(0.0, 0.0, 0.0))
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(0.0, 0.0, 0.0)
+        self.model_matrix.add_scale(1.0, 1.0, 1.0)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.cube.set_vertices(self.shader)
+        self.cube.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+        self.shader.set_material_diffuse(Color(1.0, 0.0, 0.0))
+        self.shader.set_material_ambient(Color(1.0, 0.0, 0.0))
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(0.0, -1.0 * 0.5, 0.0)
+        self.model_matrix.add_scale(1.0, 1.0, 1.0)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.cube.set_vertices(self.shader)
+        self.cube.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+        glDisable(GL_DEPTH_TEST)
+
         pygame.display.flip()
 
     # |===== MAIN PROGRAM FUNCTION =====|
