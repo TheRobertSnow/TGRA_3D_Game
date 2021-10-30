@@ -26,7 +26,7 @@ from src.essentials.hitbox import HitboxAABB
 
 # |===== MAIN PROGRAM CLASS =====|
 class FpsGame:
-    def __init__(self, mode):
+    def __init__(self, mode, id):
 
         pygame.init()
         pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF)
@@ -43,7 +43,7 @@ class FpsGame:
         # /==/ Network Interface /==/
         self.netInterf = Interface()
         # self.netId = uuid.uuid1()
-        self.netId = "Daniel"
+        self.netId = id
         self.xzAngle = 0.0
 
         # /==/ Mesh Loader /==/
@@ -159,8 +159,9 @@ class FpsGame:
     def decode_net_str(self, netStr):
         if netStr.startswith("id:"):
             temp = netStr.split("/")
-            temp[0].strip("id:")
+            #temp[0].strip("id:")
             temp1 = temp[0].split(";")
+            n = temp1[0].replace("id:", "")
             try:
                 eyex, eyey, eyez = temp1[1].split(',')
             except ValueError:
@@ -169,19 +170,22 @@ class FpsGame:
             exists = False
             opponent = None
             for op in self.opponents:
-                if (op.name == temp1[0]):
+                if (op.name == n):
                     exists = True
                     opponent = op
             if not exists:
                 newPlayer = Player()
+                newPlayer.name = n
                 newPlayer.position = Point(float(eyex), float(eyey), float(eyez))
                 newPlayer.angle = float(temp1[2])
+                opponent = newPlayer
+                self.opponents.append(opponent)
             else:
                 op.position = Point(float(eyex), float(eyey), float(eyez))
                 op.angle = float(temp1[2])
 
             if len(temp1) > 3:
-                print(temp1)
+                #print(temp1)
                 for index, value in enumerate(temp1):
                     if index != 0 and index != 1 and index != 2:
                         k, v = temp1[index].split(":")
@@ -189,6 +193,7 @@ class FpsGame:
                             opponent.health -= int(v)
                         else:
                             opponent.died = True
+        print(self.opponents)
 
 
 
@@ -450,14 +455,16 @@ class FpsGame:
         # self.model_matrix.pop_matrix()
 
         # /==/ Draw Opponents /==/
+        print("Hallo")
         for op in self.opponents:
+            print("OPP", op)
             glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
             self.model_matrix.push_matrix()
             self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
             self.model_matrix.add_rotate_y(1.5708 + op.angle)
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
             self.shader.set_model_matrix(self.model_matrix.matrix)
-            self.op.aabb.calc_aabb(self.player.vertex_arrays)
+            op.calc_aabb(self.player.vertex_arrays)
             self.player.draw(self.shader)
             self.model_matrix.pop_matrix()
 

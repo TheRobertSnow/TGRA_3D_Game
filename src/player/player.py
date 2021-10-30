@@ -8,7 +8,7 @@ from src.essentials.settings import MOVEMENTSPEED
 class Player:
     def __init__(self):
         # /==/ Positional Values /==/
-        self.id = ""
+        self.name = ""
         self.aabb = HitboxAABB()
         self.angle = 0
         self.position = Point(0, 0, 0)
@@ -38,7 +38,7 @@ class Player:
     def calc_aabb(self, vArray):
         tMax = Vector(0.0, 0.0, 0.0)
         tMin = Vector(0.0, 0.0, 0.0)
-        for key, val in self.vArray.items():
+        for key, val in vArray.items():
             for i in range(0, int(len(val)/3) -1, 3):
                 if val[i] > tMax.x: tMax.x = val[i]
                 if val[i] < tMin.x: tMin.x = val[i]
