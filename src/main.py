@@ -152,7 +152,7 @@ class FpsGame:
                     netStr += ";" + op.name + ":died"
                 else:
                     netStr += ";" + op.name + ":" + str(op.health)
-            self.playersHit.clear()
+        self.playersHit.clear()
         netStr += "/"
         print("Sending: " + netStr)
         return netStr
@@ -160,11 +160,12 @@ class FpsGame:
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         if netStr.startswith("id:"):
+            print(netStr)
             temp = netStr.split("/")
             # temp[0].strip("id:")
             temp1 = temp[0].split(";")
             n = temp1[0].replace("id:", "")
-            #print("Temp: ", temp)
+            # print("Temp: ", temp)
             try:
                 eyex, eyey, eyez = temp1[1].split(',')
             except ValueError:
@@ -173,7 +174,7 @@ class FpsGame:
             exists = False
             opponent = None
             for op in self.opponents:
-                #print("Name: " + op.name)
+                # print("Name: " + op.name)
                 if op.name == n:
                     exists = True
                     opponent = op
@@ -198,11 +199,10 @@ class FpsGame:
                                 self.health = int(v)
                             else:
                                 self.died = True
-                                print("You Died!")
                                 self.netInterf.closeSock()
                                 pygame.quit()
-            print("health:", self.health)
-            #print(self.opponents)
+            print("Health: " + str(self.health))
+            # print(self.opponents)
 
 
 
