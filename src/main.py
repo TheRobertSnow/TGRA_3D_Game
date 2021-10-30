@@ -22,6 +22,7 @@ from src.data.level_loader import *
 from src.network.interface import Interface
 from src.data import kari_loader
 from src.player.player import *
+from src.essentials.hitbox import HitboxAABB
 
 # |===== MAIN PROGRAM CLASS =====|
 class FpsGame:
@@ -109,6 +110,7 @@ class FpsGame:
         self.fireGun = False
         self.white_background = False
         self.gameMode = mode
+        self.playersHit = {}
 
     def load_texture(self, filePath):
         # Loading and Binding Texture
@@ -123,27 +125,39 @@ class FpsGame:
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
         return tex_id
 
-
     # |===== Create Network Str =====|
     def create_net_str(self):
-        netStr = str(self.netId) + ";"
+        netStr = "id:" + str(self.netId) + ";"
         netStr += self.view_matrix.get_eye_str()
-        netStr += str(self.xzAngle) + ";"
+        netStr += str(self.xzAngle)
+        if not self.playersHit:
+            for key, val in self.playersHit.items():
+                netStr += ";" + key + ":" + str(val)
+        netStr += "/"
+        print("Sending: " + netStr)
         return netStr
 
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
-        temp = netStr.split(";")
-        print("Temp: ", temp)
-        try:
-            eyex, eyey, eyez = temp[1].split(',')
-        except ValueError:
-            print("ERROR")
-            return
-        self.opponents[temp[0]] = {
-            "eye": Point(float(eyex), float(eyey), float(eyez)),
-            "xzAngle": float(temp[2])
-        }
+        if netStr.startswith("id:"):
+            temp = netStr.split("/")
+            temp[0].strip("id:")
+            print("Temp: ", temp)
+            try:
+                eyex, eyey, eyez = temp[1].split(',')
+            except ValueError:
+                print("ERROR")
+                return
+            self.opponents[temp[0]] = {
+                "eye": Point(float(eyex), float(eyey), float(eyez)),
+                "xzAngle": float(temp[2])
+            }
+            if len(temp) > 3:
+                for index, value in enumerate(temp):
+                    if index != 0 and index != 1 and index != 2:
+                        k, v = temp[index].split(":")
+                        if (v != "died"):
+                            self.opponents[k] = int(v)
 
 
     def check_if_player_moving(self):
@@ -207,6 +221,18 @@ class FpsGame:
             if mouseYNew < 0:
                 self.view_matrix.pitch(-mouseYNew * delta_time)
 
+        if self.fireGun:
+            # /==/ Do some gun shit /==/
+            # cast ray and see if it hits player
+            self.player.isHit = self.player.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
+            for key, val in self.opponents.items():
+                if "aabb" in val.keys():
+                    isHit = val["aabb"].ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
+                    if isHit:
+                        self.playersHit[key]=10
+                # if mesh is hit add it to isHit dictionary
+            self.fireGun = False
+
         if self.netInterf.isAvailable:
             if self.check_if_player_moving():
                 t1 = time.process_time() - self.t0
@@ -219,11 +245,6 @@ class FpsGame:
             recvString = self.netInterf.recv()
             if recvString != "":
                 self.decode_net_str(recvString)
-
-        if self.fireGun:
-            # /==/ Do some gun shit /==/
-            self.player.isHit = self.player.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
-            self.fireGun = False
 
     # |===== DISPLAY =====|
     def display(self):
@@ -430,6 +451,8 @@ class FpsGame:
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
             self.shader.set_model_matrix(self.model_matrix.matrix)
             self.player.recalc_aabb()
+            if "aabb" not in val.keys():
+                val["aabb"] = HitboxAABB(self.player.aabb.min, self.player.aabb.max)
             self.player.draw(self.shader)
             self.model_matrix.pop_matrix()
 

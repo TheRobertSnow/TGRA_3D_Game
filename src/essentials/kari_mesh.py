@@ -2,6 +2,7 @@ import numpy as numpy
 from OpenGL.GL import *
 
 from src.essentials.hitbox import HitboxAABB
+from src.essentials.settings import TYPE_PLAYER, TYPE_ENVIRON
 
 class MeshModel:
     def __init__(self):
@@ -11,6 +12,7 @@ class MeshModel:
         self.vertex_counts = dict()
         self.vertex_buffer_ids = dict()
         self.aabb = HitboxAABB()
+        self.type = None
         self.isHit = False
 
     def add_vertex(self, mesh_id, position, normal, uv=None):
@@ -47,6 +49,12 @@ class MeshModel:
             glBindBuffer(GL_ARRAY_BUFFER, self.vertex_buffer_ids[mesh_id])
             glBufferData(GL_ARRAY_BUFFER, numpy.array(self.vertex_arrays[mesh_id], dtype='float32'), GL_STATIC_DRAW)
             glBindBuffer(GL_ARRAY_BUFFER, 0)
+
+    def set_type_player(self):
+        self.type = TYPE_PLAYER
+
+    def set_type_environment(self):
+        self.type = TYPE_ENVIRON
 
     def draw(self, shader):
         for mesh_id, mesh_material in self.mesh_materials.items():
