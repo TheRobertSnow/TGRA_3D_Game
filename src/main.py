@@ -217,7 +217,8 @@ class FpsGame:
 
         if self.fireGun:
             # /==/ Do some gun shit /==/
-            pass
+            self.player.isHit = self.player.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
+            self.fireGun = False
 
     # |===== DISPLAY =====|
     def display(self):
@@ -378,17 +379,19 @@ class FpsGame:
         self.shader.set_model_matrix(self.model_matrix.matrix)
         self.mr_box.draw(self.shader)
         self.model_matrix.pop_matrix()
-        #
-        # self.shader.set_diffuse_tex(0)
-        # self.shader.set_specular_tex(0)
-        # self.shader.set_ambient_tex(0)
-        # self.model_matrix.push_matrix()
-        # self.model_matrix.add_translation(1.0, 1.0, 1.0)
-        # self.model_matrix.add_scale(1.0, 1.0, 1.0)
-        # self.shader.set_model_matrix(self.model_matrix.matrix)
-        # self.player.draw(self.shader)
-        # self.model_matrix.pop_matrix()
-        #
+
+        if not self.player.isHit:
+            self.shader.set_diffuse_tex(0)
+            self.shader.set_specular_tex(0)
+            self.shader.set_ambient_tex(0)
+            self.model_matrix.push_matrix()
+            self.model_matrix.add_translation(1.0, 1.0, 1.0)
+            self.model_matrix.add_scale(1.0, 1.0, 1.0)
+            self.shader.set_model_matrix(self.model_matrix.matrix)
+            self.player.recalc_aabb()
+            self.player.draw(self.shader)
+            self.model_matrix.pop_matrix()
+
         # self.model_matrix.push_matrix()
         # self.model_matrix.add_translation(4.0, 4.0, 4.0)
         # self.model_matrix.add_scale(0.1, 0.1, 0.1)
@@ -424,6 +427,7 @@ class FpsGame:
             self.model_matrix.add_rotate_y(1.5708 + val["xzAngle"])
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
             self.shader.set_model_matrix(self.model_matrix.matrix)
+            self.player.recalc_aabb()
             self.player.draw(self.shader)
             self.model_matrix.pop_matrix()
 

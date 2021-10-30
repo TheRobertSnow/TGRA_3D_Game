@@ -56,9 +56,44 @@ class HitboxAABB:
                 (self.minY <= other.maxY and self.maxY >= other.minY) and
                 (self.minZ <= other.maxZ and self.maxZ >= other.minZ))
 
-    def ray_intersects_aabb(self, ray) -> bool:
-        # max
-        return False
+    def ray_intersects_aabb(self, origin, direction) -> bool:
+        tmin = (self.min.x - origin.x) / direction.x
+        tmax = (self.max.x - origin.x) / direction.x
+
+        if (tmin > tmax):
+            temp = tmin
+            tmin = tmax
+            tmax = temp
+
+        tymin = (self.min.y - origin.y) / direction.y
+        tymax = (self.max.y - origin.y) / direction.y
+
+        if (tmin > tymax or tymin > tmax):
+            temp = tymin
+            tymin = tymax
+            tymax = temp
+
+        if (tmin > tymax or tymin > tmax):
+            return False
+
+        if (tymin > tmin):
+            tmin = tymin
+
+        if (tymax < tmax):
+            tmax = tymax
+
+        tzmin = (self.min.y - origin.z) / direction.z
+        tzmax = (self.max.z - origin.z) / direction.z
+
+        if (tmin > tzmax or tzmin > tmax):
+            temp = tzmin
+            tzmin = tzmax
+            tzmax = temp
+
+        if (tmin > tzmax or tzmin > tmax):
+            return False
+
+        return True
 
     def __str__(self):
         return "[" + str(self.max) + ", " + str(self.min) + "]"

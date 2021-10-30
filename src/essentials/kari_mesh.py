@@ -11,6 +11,7 @@ class MeshModel:
         self.vertex_counts = dict()
         self.vertex_buffer_ids = dict()
         self.aabb = HitboxAABB()
+        self.isHit = False
 
     def add_vertex(self, mesh_id, position, normal, uv=None):
         if mesh_id not in self.vertex_arrays:
@@ -28,6 +29,16 @@ class MeshModel:
     def set_aabb(self, vMax, vMin):
         self.aabb.set_max(vMax)
         self.aabb.set_min(vMin)
+
+    def recalc_aabb(self):
+        for key, val in self.vertex_arrays.items():
+            for i in range(0, int(len(val)/3) -1, 3):
+                if val[i] > self.aabb.max.x: self.aabb.max.x = val[i]
+                if val[i] < self.aabb.min.x: self.aabb.min.x = val[i]
+                if val[i+1] > self.aabb.max.y: self.aabb.max.y = val[i+1]
+                if val[i+1] < self.aabb.min.y: self.aabb.min.y = val[i+1]
+                if val[i+2] > self.aabb.max.z: self.aabb.max.z = val[i+2]
+                if val[i+2] < self.aabb.min.z: self.aabb.min.z = val[i+2]
 
     # Makes buffers for each of the mesh id
     def set_opengl_buffers(self):
