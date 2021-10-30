@@ -159,18 +159,20 @@ class FpsGame:
     def decode_net_str(self, netStr):
         if netStr.startswith("id:"):
             temp = netStr.split("/")
-            #temp[0].strip("id:")
+            # temp[0].strip("id:")
             temp1 = temp[0].split(";")
             n = temp1[0].replace("id:", "")
+            print("Temp: ", temp)
             try:
                 eyex, eyey, eyez = temp1[1].split(',')
             except ValueError:
-                print("ERROR")
+                # print("ERROR")
                 return
             exists = False
             opponent = None
             for op in self.opponents:
-                if (op.name == n):
+                print("Name: " + op.name)
+                if op.name == n:
                     exists = True
                     opponent = op
             if not exists:
@@ -185,7 +187,7 @@ class FpsGame:
                 op.angle = float(temp1[2])
 
             if len(temp1) > 3:
-                #print(temp1)
+                # print(temp1)
                 for index, value in enumerate(temp1):
                     if index != 0 and index != 1 and index != 2:
                         k, v = temp1[index].split(":")
@@ -193,7 +195,7 @@ class FpsGame:
                             opponent.health -= int(v)
                         else:
                             opponent.died = True
-        print(self.opponents)
+            print(self.opponents)
 
 
 
@@ -246,9 +248,9 @@ class FpsGame:
 
         if self.mouseMove:
             mouseXNew, mouseYNew = pygame.mouse.get_rel()
-            mouseXNew = (mouseXNew / 25) * 15
+            mouseXNew = (mouseXNew / 25) * 4
             self.xzAngle += -mouseXNew * delta_time
-            mouseYNew = (mouseYNew / 25) * 15
+            mouseYNew = (mouseYNew / 25) * 4
             if mouseXNew > 0:
                 self.view_matrix.yaw(-mouseXNew * delta_time)
             if mouseXNew < 0:
