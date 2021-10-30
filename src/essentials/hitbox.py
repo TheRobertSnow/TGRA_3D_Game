@@ -75,7 +75,7 @@ class HitboxAABB:
         tymin = (self.min.y - origin.y) / direction.y
         tymax = (self.max.y - origin.y) / direction.y
 
-        if (tmin > tymax or tymin > tmax):
+        if (tmin > tymax):
             temp = tymin
             tymin = tymax
             tymax = temp
@@ -89,10 +89,10 @@ class HitboxAABB:
         if (tymax < tmax):
             tmax = tymax
 
-        tzmin = (self.min.y - origin.z) / direction.z
+        tzmin = (self.min.z - origin.z) / direction.z
         tzmax = (self.max.z - origin.z) / direction.z
 
-        if (tmin > tzmax or tzmin > tmax):
+        if (tmin > tzmax):
             temp = tzmin
             tzmin = tzmax
             tzmax = temp

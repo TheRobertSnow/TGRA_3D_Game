@@ -113,6 +113,8 @@ class FpsGame:
         self.white_background = False
         self.gameMode = mode
         self.playersHit = []
+        self.health = 100
+        self.died = False
 
     def load_texture(self, filePath):
         # Loading and Binding Texture
@@ -149,8 +151,8 @@ class FpsGame:
                 if op.died:
                     netStr += ";" + op.name + ":died"
                 else:
-                    netStr += ";" + op.name + str(op.health)
-            self.playersHit.clear()
+                    netStr += ";" + op.name + ":" + str(op.health)
+        self.playersHit.clear()
         netStr += "/"
         print("Sending: " + netStr)
         return netStr
@@ -158,11 +160,12 @@ class FpsGame:
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         if netStr.startswith("id:"):
+            print(netStr)
             temp = netStr.split("/")
             # temp[0].strip("id:")
             temp1 = temp[0].split(";")
             n = temp1[0].replace("id:", "")
-            print("Temp: ", temp)
+            # print("Temp: ", temp)
             try:
                 eyex, eyey, eyez = temp1[1].split(',')
             except ValueError:
@@ -171,7 +174,7 @@ class FpsGame:
             exists = False
             opponent = None
             for op in self.opponents:
-                print("Name: " + op.name)
+                # print("Name: " + op.name)
                 if op.name == n:
                     exists = True
                     opponent = op
@@ -191,11 +194,15 @@ class FpsGame:
                 for index, value in enumerate(temp1):
                     if index != 0 and index != 1 and index != 2:
                         k, v = temp1[index].split(":")
-                        if (v != "died"):
-                            opponent.health -= int(v)
-                        else:
-                            opponent.died = True
-            print(self.opponents)
+                        if k == self.netId:
+                            if (v != "died"):
+                                self.health = int(v)
+                            else:
+                                self.died = True
+                                self.netInterf.closeSock()
+                                pygame.quit()
+            print("Health: " + str(self.health))
+            # print(self.opponents)
 
 
 
@@ -269,7 +276,9 @@ class FpsGame:
                 isHit = op.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
                 print(isHit)
                 if isHit:
-                    self.op.health -= 10
+                    op.health -= 10
+                    if op.health <= 0:
+                        op.died = True
                 if op not in self.playersHit:
                     self.playersHit.append(op)
                 # if mesh is hit add it to isHit list
@@ -278,7 +287,7 @@ class FpsGame:
         if self.netInterf.isAvailable:
             if self.check_if_player_moving():
                 t1 = time.process_time() - self.t0
-                if t1 >= 0.1:
+                if t1 >= 0.05:
                     # Add zxAngle to send()
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
@@ -458,15 +467,16 @@ class FpsGame:
 
         # /==/ Draw Opponents /==/
         for op in self.opponents:
-            glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
-            self.model_matrix.push_matrix()
-            self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
-            self.model_matrix.add_rotate_y(1.5708 + op.angle)
-            self.model_matrix.add_scale(1.0, 1.0, 1.0)
-            self.shader.set_model_matrix(self.model_matrix.matrix)
-            op.calc_aabb(self.player.vertex_arrays)
-            self.player.draw(self.shader)
-            self.model_matrix.pop_matrix()
+            if not op.died:
+                glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
+                self.model_matrix.push_matrix()
+                self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
+                self.model_matrix.add_rotate_y(1.5708 + op.angle)
+                self.model_matrix.add_scale(1.0, 1.0, 1.0)
+                self.shader.set_model_matrix(self.model_matrix.matrix)
+                op.calc_aabb(self.player.vertex_arrays)
+                self.player.draw(self.shader)
+                self.model_matrix.pop_matrix()
 
         glDisable(GL_DEPTH_TEST)
 
