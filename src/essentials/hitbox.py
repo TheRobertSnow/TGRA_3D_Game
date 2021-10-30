@@ -36,9 +36,16 @@ class HitboxSphere:
 
 
 class HitboxAABB:
-    def __init__(self):
-        self.min = Vector(0.0, 0.0, 0.0)
-        self.max = Vector(0.0, 0.0, 0.0)
+    def __init__(self, vMin:Vector=None, vMax:Vector=None):
+        if vMin != None:
+            self.min = vMin
+        else:
+            self.min = Vector(0.0, 0.0, 0.0)
+        if vMax != None:
+            self.max = vMax
+        else:
+            self.max = Vector(0.0, 0.0, 0.0)
+
 
     def set_max(self, max: Vector):
         self.max = max
