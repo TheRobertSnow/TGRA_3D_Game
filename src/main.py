@@ -84,7 +84,7 @@ class FpsGame:
 
         # /==/ Players /==/
         self.playerCharacter = Player()
-        self.opponents = {}
+        self.opponents = []
 
         self.bullets = []
 
@@ -112,7 +112,7 @@ class FpsGame:
         self.fireGun = False
         self.white_background = False
         self.gameMode = mode
-        self.playersHit = {}
+        self.playersHit = []
 
     def load_texture(self, filePath):
         # Loading and Binding Texture
@@ -144,9 +144,13 @@ class FpsGame:
         netStr = "id:" + str(self.netId) + ";"
         netStr += self.view_matrix.get_eye_str()
         netStr += str(self.xzAngle)
-        if not self.playersHit:
-            for key, val in self.playersHit.items():
-                netStr += ";" + key + ":" + str(val)
+        if self.playersHit:
+            for op in self.playersHit:
+                if op.died:
+                    netStr += ";" + op.name + ":died"
+                else:
+                    netStr += ";" + op.name + str(op.health)
+            self.playersHit.clear()
         netStr += "/"
         print("Sending: " + netStr)
         return netStr
@@ -157,22 +161,35 @@ class FpsGame:
             temp = netStr.split("/")
             temp[0].strip("id:")
             temp1 = temp[0].split(";")
-            print("Temp: ", temp)
             try:
                 eyex, eyey, eyez = temp1[1].split(',')
             except ValueError:
                 print("ERROR")
                 return
-            self.opponents[temp1[0]] = {
-                "eye": Point(float(eyex), float(eyey), float(eyez)),
-                "xzAngle": float(temp1[2])
-            }
+            exists = False
+            opponent = None
+            for op in self.opponents:
+                if (op.name == temp1[0]):
+                    exists = True
+                    opponent = op
+            if not exists:
+                newPlayer = Player()
+                newPlayer.position = Point(float(eyex), float(eyey), float(eyez))
+                newPlayer.angle = float(temp1[2])
+            else:
+                op.position = Point(float(eyex), float(eyey), float(eyez))
+                op.angle = float(temp1[2])
+
             if len(temp1) > 3:
+                print(temp1)
                 for index, value in enumerate(temp1):
                     if index != 0 and index != 1 and index != 2:
                         k, v = temp1[index].split(":")
                         if (v != "died"):
-                            self.opponents[k] = int(v)
+                            opponent.health -= int(v)
+                        else:
+                            opponent.died = True
+
 
 
     def check_if_player_moving(self):
@@ -240,12 +257,15 @@ class FpsGame:
             # /==/ Do some gun shit /==/
             # cast ray and see if it hits player
             self.player.isHit = self.player.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
-            for key, val in self.opponents.items():
-                if "aabb" in val.keys():
-                    isHit = val["aabb"].ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
-                    if isHit:
-                        self.playersHit[key]=10
-                # if mesh is hit add it to isHit dictionary
+            for op in self.opponents:
+                # print(val["aabb"])
+                isHit = op.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
+                print(isHit)
+                if isHit:
+                    self.op.health -= 10
+                if op not in self.playersHit:
+                    self.playersHit.append(op)
+                # if mesh is hit add it to isHit list
             self.fireGun = False
 
         if self.netInterf.isAvailable:
@@ -430,16 +450,14 @@ class FpsGame:
         # self.model_matrix.pop_matrix()
 
         # /==/ Draw Opponents /==/
-        for key, val in self.opponents.items():
+        for op in self.opponents:
             glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
             self.model_matrix.push_matrix()
-            self.model_matrix.add_translation(val["eye"].x, val["eye"].y, val["eye"].z)
-            self.model_matrix.add_rotate_y(1.5708 + val["xzAngle"])
+            self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
+            self.model_matrix.add_rotate_y(1.5708 + op.angle)
             self.model_matrix.add_scale(1.0, 1.0, 1.0)
             self.shader.set_model_matrix(self.model_matrix.matrix)
-            self.player.recalc_aabb()
-            if "aabb" not in val.keys():
-                val["aabb"] = HitboxAABB(self.player.aabb.min, self.player.aabb.max)
+            self.op.aabb.calc_aabb(self.player.vertex_arrays)
             self.player.draw(self.shader)
             self.model_matrix.pop_matrix()
 
