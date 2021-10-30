@@ -45,6 +45,7 @@ class HitboxAABB:
             self.max = vMax
         else:
             self.max = Vector(0.0, 0.0, 0.0)
+        self.vertArray = []
 
 
     def set_max(self, max: Vector):
@@ -101,6 +102,7 @@ class HitboxAABB:
             return False
 
         return True
+
 
     def __str__(self):
         return "[" + str(self.max) + ", " + str(self.min) + "]"

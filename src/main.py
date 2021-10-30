@@ -270,10 +270,12 @@ class FpsGame:
         if self.fireGun:
             # /==/ Do some gun shit /==/
             # cast ray and see if it hits player
-            self.player.isHit = self.player.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
+            #self.player.recalc_aabb()
+            self.player.isHit = self.player.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1))
             for op in self.opponents:
                 # print(val["aabb"])
-                isHit = op.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1) * 100)
+                #op.calc_aabb(self.player.vertex_arrays)
+                isHit = op.aabb.ray_intersects_aabb(self.view_matrix.eye, self.view_matrix.n * -1)
                 print(isHit)
                 if isHit:
                     op.health -= 10
@@ -437,8 +439,14 @@ class FpsGame:
 
         # /==/ Draw jeff /==/
         if not self.player.isHit:
-            self.player.recalc_aabb()
-            self.drawObject(self.player, self.jeff_texture, Vector(1.0, 1.0, 1.0))
+            # y max 2.15
+            # y min 0.01
+            # x max 0.35
+            # x min -0.35
+            # z max 0.35
+            # z max -0.35
+            self.player.set_aabb(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
+            self.drawObject(self.player, self.jeff_texture, Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), Vector(0.0, 1.5708, 0.0))
 
         # self.model_matrix.push_matrix()
         # self.model_matrix.add_translation(4.0, 4.0, 4.0)
@@ -474,7 +482,8 @@ class FpsGame:
                 self.model_matrix.add_rotate_y(1.5708 + op.angle)
                 self.model_matrix.add_scale(1.0, 1.0, 1.0)
                 self.shader.set_model_matrix(self.model_matrix.matrix)
-                op.calc_aabb(self.player.vertex_arrays)
+                op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
+                op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
                 self.player.draw(self.shader)
                 self.model_matrix.pop_matrix()
 
