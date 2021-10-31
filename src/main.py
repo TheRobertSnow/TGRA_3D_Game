@@ -120,6 +120,10 @@ class FpsGame:
         self.playersHit = []
         self.health = 100
         self.died = False
+        self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
+        self.collission = False
+        self.respawned = False
+        self.left = False
 
     def load_texture(self, filePath):
         # Loading and Binding Texture
@@ -157,6 +161,12 @@ class FpsGame:
                     netStr += ";" + op.name + ":died"
                 else:
                     netStr += ";" + op.name + ":" + str(op.health)
+        if self.respawned:
+            print("REspawn")
+            netStr += ";" + self.netId + ":respawn"
+            self.respawned = False
+        if self.left:
+            netStr += ";" + self.netId + ":left"
         self.playersHit.clear()
         netStr += "/"
         print("Sending: " + netStr)
@@ -165,7 +175,7 @@ class FpsGame:
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         if netStr.startswith("id:"):
-            print(netStr)
+            #print(netStr)
             temp = netStr.split("/")
             # temp[0].strip("id:")
             temp1 = temp[0].split(";")
@@ -195,7 +205,6 @@ class FpsGame:
                 op.angle = float(temp1[2])
 
             if len(temp1) > 3:
-                # print(temp1)
                 for index, value in enumerate(temp1):
                     if index != 0 and index != 1 and index != 2:
                         k, v = temp1[index].split(":")
@@ -204,8 +213,18 @@ class FpsGame:
                                 self.health = int(v)
                             else:
                                 self.died = True
-                                self.netInterf.closeSock()
-                                pygame.quit()
+                        if v == "respawn":
+                            for op in self.opponents:
+                                if op.name == k:
+                                    op.health = 100
+                                    op.died = False
+                        if v == "left":
+                            print("HSGDFHFGADUIF")
+                            for index, op in enumerate(self.opponents):
+                                if op.name == k:
+                                    self.opponents.pop(index)
+
+
             print("Health: " + str(self.health))
             # print(self.opponents)
 
@@ -225,24 +244,70 @@ class FpsGame:
         else:
             return False
 
+    def respawn(self):
+        self.health = 100
+        self.died = False
+        self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
+        self.respawned = True
 
     # |===== UPDATE =====|
     def update(self):
         delta_time = self.clock.tick() / 1000.0
+        #print(self.aabb)
 
         self.angle += pi * delta_time
         # if self.angle > 2 * pi:
         #     self.angle -= (2 * pi)
 
+        # /==/ Respawn /==/
+        if self.died:
+            self.respawn()
+
+        # /==/ Update Max Min of AABB /==/
+        self.aabb.set_max(
+            Vector(0.70 + self.view_matrix.eye.x, 2.15 + self.view_matrix.eye.y, 0.70 + self.view_matrix.eye.z))
+        self.aabb.set_min(
+            Vector(-0.70 + self.view_matrix.eye.x, 0.01 + self.view_matrix.eye.y, -0.70 + self.view_matrix.eye.z))
+
+        # Movement disabled
+        slidePosX = False
+        slideNegX = False
+        slidePosZ = False
+        slideNegZ = False
+
+        # Collision detection
+        collisionRadius = 0.75
+        for wall in self.levelWalls:
+            data = wall.checkIfCollission(self.aabb.min, self.aabb.max)
+            if data[0]:
+                self.collission = True
+                if not slidePosX:
+                    slidePosX = data[1]
+                if not slideNegX:
+                    slideNegX = data[2]
+                if not slidePosZ:
+                    slidePosZ = data[3]
+                if not slideNegZ:
+                    slideNegZ = data[4]
+
+        # evilCollisionRadius = 0.5
+        # for evilObject in self.levelEvilObjects:
+        #     evilObject.update(1 * delta_time)  # Move evil objects back and forth
+        #     if evilObject.checkIfCollission(self.viewMatrix.eye.x, self.viewMatrix.eye.z,
+        #                                     evilCollisionRadius):  # if collission then game over
+        #         print("You Lost The Game")
+        #         exit()
+
         # /==/ User Input /==/
+        blockedPosArray = [slidePosX, slideNegX, slidePosZ, slideNegZ]
         if W_KEY.isPressed:
-            self.view_matrix.slide(0, 0, -self.speed * delta_time)
+            self.view_matrix.move(0, 0, -self.speed * delta_time, blockedPosArray)
         if A_KEY.isPressed:
-            self.view_matrix.slide(-self.speed * delta_time, 0, 0)
+            self.view_matrix.move(-self.speed * delta_time, 0, 0, blockedPosArray)
         if S_KEY.isPressed:
-            self.view_matrix.slide(0, 0, self.speed * delta_time)
+            self.view_matrix.move(0, 0, self.speed * delta_time, blockedPosArray)
         if D_KEY.isPressed:
-            self.view_matrix.slide(self.speed * delta_time, 0, 0)
+            self.view_matrix.move(self.speed * delta_time, 0, 0, blockedPosArray)
         if LSHIFT_KEY.isPressed:
             self.speed = MOVEMENTSPEED * 2
         if not LSHIFT_KEY.isPressed:
@@ -292,7 +357,7 @@ class FpsGame:
         if self.netInterf.isAvailable:
             if self.check_if_player_moving():
                 t1 = time.process_time() - self.t0
-                if t1 >= 0.05:
+                if t1 >= 0.05 or self.left:
                     # Add zxAngle to send()
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
@@ -439,7 +504,7 @@ class FpsGame:
 
         # /==/ Draw Opponents /==/
         for op in self.opponents:
-            #if not op.died:
+            # if not op.died:
             glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
             self.model_matrix.push_matrix()
             self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
@@ -502,12 +567,14 @@ class FpsGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     print("Quitting!")
-                    self.netInterf.closeSock()
+                    self.left = True
+                    self.create_net_str()
                     exiting = True
                 elif event.type == pygame.KEYDOWN:
                     if event.key == K_ESCAPE:
                         print("Escaping!")
-                        self.netInterf.closeSock()
+                        self.left = True
+                        self.create_net_str()
                         exiting = True
 
                     if event.key == W_KEY.key:
@@ -550,6 +617,7 @@ class FpsGame:
             self.update()
             self.display()
 
+        self.netInterf.closeSock()
         # OUT OF GAME LOOP
         pygame.quit()
 
