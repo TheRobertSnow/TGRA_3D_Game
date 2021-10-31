@@ -162,25 +162,20 @@ class FpsGame:
                 else:
                     netStr += ";" + op.name + ":" + str(op.health)
         if self.respawned:
-            print("REspawn")
             netStr += ";" + self.netId + ":respawn"
             self.respawned = False
         if self.left:
             netStr += ";" + self.netId + ":left"
         self.playersHit.clear()
         netStr += "/"
-        print("Sending: " + netStr)
         return netStr
 
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         if netStr.startswith("id:"):
-            #print(netStr)
             temp = netStr.split("/")
-            # temp[0].strip("id:")
             temp1 = temp[0].split(";")
             n = temp1[0].replace("id:", "")
-            # print("Temp: ", temp)
             try:
                 eyex, eyey, eyez = temp1[1].split(',')
             except ValueError:
@@ -189,7 +184,6 @@ class FpsGame:
             exists = False
             opponent = None
             for op in self.opponents:
-                # print("Name: " + op.name)
                 if op.name == n:
                     exists = True
                     opponent = op
@@ -219,14 +213,9 @@ class FpsGame:
                                     op.health = 100
                                     op.died = False
                         if v == "left":
-                            print("HSGDFHFGADUIF")
                             for index, op in enumerate(self.opponents):
                                 if op.name == k:
                                     self.opponents.pop(index)
-
-
-            print("Health: " + str(self.health))
-            # print(self.opponents)
 
     def check_if_player_moving(self):
         if W_KEY.isPressed:
@@ -253,7 +242,6 @@ class FpsGame:
     # |===== UPDATE =====|
     def update(self):
         delta_time = self.clock.tick() / 1000.0
-        #print(self.aabb)
 
         self.angle += pi * delta_time
         # if self.angle > 2 * pi:
@@ -338,13 +326,9 @@ class FpsGame:
         if self.fireGun:
             # /==/ Do some gun shit /==/
             # cast ray and see if it hits player
-            #self.player.recalc_aabb()
             self.player.isHit = self.player.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1))
             for op in self.opponents:
-                # print(val["aabb"])
-                #op.calc_aabb(self.player.vertex_arrays)
                 isHit = op.aabb.ray_intersects_aabb(self.view_matrix.eye, self.view_matrix.n * -1)
-                print(isHit)
                 if isHit:
                     op.health -= 10
                     if op.health <= 0:
