@@ -168,18 +168,14 @@ class FpsGame:
             netStr += ";" + self.netId + ":left"
         self.playersHit.clear()
         netStr += "/"
-        print("Sending: " + netStr)
         return netStr
 
     # |===== Decode Net String =====|
     def decode_net_str(self, netStr):
         if netStr.startswith("id:"):
-            print(netStr)
             temp = netStr.split("/")
-            # temp[0].strip("id:")
             temp1 = temp[0].split(";")
             n = temp1[0].replace("id:", "")
-            # print("Temp: ", temp)
             try:
                 eyex, eyey, eyez = temp1[1].split(',')
             except ValueError:
@@ -188,7 +184,6 @@ class FpsGame:
             exists = False
             opponent = None
             for op in self.opponents:
-                # print("Name: " + op.name)
                 if op.name == n:
                     exists = True
                     opponent = op
@@ -204,7 +199,6 @@ class FpsGame:
                 op.angle = float(temp1[2])
 
             if len(temp1) > 3:
-                # print(temp1)
                 for index, value in enumerate(temp1):
                     if index != 0 and index != 1 and index != 2:
                         k, v = temp1[index].split(":")
@@ -222,12 +216,6 @@ class FpsGame:
                             for index, op in enumerate(self.opponents):
                                 if op.name == k:
                                     self.opponents.pop(index)
-
-
-            print("Health: " + str(self.health))
-            for op in self.opponents:
-                print(op.name, op.health)
-            # print(self.opponents)
 
     def check_if_player_moving(self):
         if W_KEY.isPressed:
@@ -338,13 +326,9 @@ class FpsGame:
         if self.fireGun:
             # /==/ Do some gun shit /==/
             # cast ray and see if it hits player
-            #self.player.recalc_aabb()
             self.player.isHit = self.player.aabb.ray_intersects_aabb(self.view_matrix.eye, (self.view_matrix.n * -1))
             for op in self.opponents:
-                # print(val["aabb"])
-                #op.calc_aabb(self.player.vertex_arrays)
                 isHit = op.aabb.ray_intersects_aabb(self.view_matrix.eye, self.view_matrix.n * -1)
-                print(isHit)
                 if isHit:
                     op.health -= 10
                     if op.health <= 0:
@@ -616,6 +600,7 @@ class FpsGame:
 
             self.update()
             self.display()
+
         self.netInterf.closeSock()
         # OUT OF GAME LOOP
         pygame.quit()
