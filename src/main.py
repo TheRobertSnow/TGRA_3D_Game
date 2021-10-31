@@ -123,6 +123,7 @@ class FpsGame:
         self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
         self.collission = False
         self.respawned = False
+        self.left = False
 
     def load_texture(self, filePath):
         # Loading and Binding Texture
@@ -160,9 +161,11 @@ class FpsGame:
                     netStr += ";" + op.name + ":died"
                 else:
                     netStr += ";" + op.name + ":" + str(op.health)
-            if self.respawned:
-                netStr += ";" + self.netId + ":respawn"
-                self.respawned = False
+        if self.respawned:
+            netStr += ";" + self.netId + ":respawn"
+            self.respawned = False
+        if self.left:
+            netStr += ";" + self.netId + ":left"
         self.playersHit.clear()
         netStr += "/"
         print("Sending: " + netStr)
@@ -214,9 +217,16 @@ class FpsGame:
                             for op in self.opponents:
                                 if op.name == k:
                                     op.health = 100
+                                    op.died = False
+                        if v == "left":
+                            for index, op in enumerate(self.opponents):
+                                if op.name == k:
+                                    self.opponents.pop(index)
 
 
             print("Health: " + str(self.health))
+            for op in self.opponents:
+                print(op.name, op.health)
             # print(self.opponents)
 
     def check_if_player_moving(self):
@@ -244,7 +254,6 @@ class FpsGame:
     # |===== UPDATE =====|
     def update(self):
         delta_time = self.clock.tick() / 1000.0
-        print(self.aabb)
 
         self.angle += pi * delta_time
         # if self.angle > 2 * pi:
@@ -348,7 +357,7 @@ class FpsGame:
         if self.netInterf.isAvailable:
             if self.check_if_player_moving():
                 t1 = time.process_time() - self.t0
-                if t1 >= 0.05:
+                if t1 >= 0.05 or self.left:
                     # Add zxAngle to send()
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
@@ -558,12 +567,14 @@ class FpsGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     print("Quitting!")
-                    self.netInterf.closeSock()
+                    self.left = True
+                    self.create_net_str()
                     exiting = True
                 elif event.type == pygame.KEYDOWN:
                     if event.key == K_ESCAPE:
                         print("Escaping!")
-                        self.netInterf.closeSock()
+                        self.left = True
+                        self.create_net_str()
                         exiting = True
 
                     if event.key == W_KEY.key:
@@ -605,7 +616,7 @@ class FpsGame:
 
             self.update()
             self.display()
-
+        self.netInterf.closeSock()
         # OUT OF GAME LOOP
         pygame.quit()
 

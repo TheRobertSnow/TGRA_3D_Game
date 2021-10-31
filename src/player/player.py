@@ -21,6 +21,7 @@ class Player:
         self.health = 100
         self.armor = 50
         self.died = False
+        self.left = False
         self.movement = MOVEMENTSPEED
 
     def move(self, del_u, del_v, del_n):
