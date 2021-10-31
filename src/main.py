@@ -122,6 +122,7 @@ class FpsGame:
         self.died = False
         self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
         self.collission = False
+        self.respawned = False
 
     def load_texture(self, filePath):
         # Loading and Binding Texture
@@ -159,6 +160,9 @@ class FpsGame:
                     netStr += ";" + op.name + ":died"
                 else:
                     netStr += ";" + op.name + ":" + str(op.health)
+            if self.respawned:
+                netStr += ";" + self.netId + ":respawn"
+                self.respawned = False
         self.playersHit.clear()
         netStr += "/"
         print("Sending: " + netStr)
@@ -206,8 +210,12 @@ class FpsGame:
                                 self.health = int(v)
                             else:
                                 self.died = True
-                                self.netInterf.closeSock()
-                                pygame.quit()
+                        if v == "respawn":
+                            for op in self.opponents:
+                                if op.name == k:
+                                    op.health = 100
+
+
             print("Health: " + str(self.health))
             # print(self.opponents)
 
@@ -227,6 +235,11 @@ class FpsGame:
         else:
             return False
 
+    def respawn(self):
+        self.health = 100
+        self.died = False
+        self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
+        self.respawned = True
 
     # |===== UPDATE =====|
     def update(self):
@@ -236,6 +249,10 @@ class FpsGame:
         self.angle += pi * delta_time
         # if self.angle > 2 * pi:
         #     self.angle -= (2 * pi)
+
+        # /==/ Respawn /==/
+        if self.died:
+            self.respawn()
 
         # /==/ Update Max Min of AABB /==/
         self.aabb.set_max(
@@ -478,17 +495,17 @@ class FpsGame:
 
         # /==/ Draw Opponents /==/
         for op in self.opponents:
-            if not op.died:
-                glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
-                self.model_matrix.push_matrix()
-                self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
-                self.model_matrix.add_rotate_y(1.5708 + op.angle)
-                self.model_matrix.add_scale(1.0, 1.0, 1.0)
-                self.shader.set_model_matrix(self.model_matrix.matrix)
-                op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
-                op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
-                self.player.draw(self.shader)
-                self.model_matrix.pop_matrix()
+            # if not op.died:
+            glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
+            self.model_matrix.push_matrix()
+            self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
+            self.model_matrix.add_rotate_y(1.5708 + op.angle)
+            self.model_matrix.add_scale(1.0, 1.0, 1.0)
+            self.shader.set_model_matrix(self.model_matrix.matrix)
+            op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
+            op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
+            self.player.draw(self.shader)
+            self.model_matrix.pop_matrix()
 
         glDisable(GL_DEPTH_TEST)
 
