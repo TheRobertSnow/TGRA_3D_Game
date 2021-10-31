@@ -1,44 +1,43 @@
 from os import DirEntry
-from src.essentials.vector import Vector
-
+from src.essentials.color import *
+from src.essentials.vector import *
 
 class EvilObject:
     # Class for handeling walls
     def __init__(self, color, translationStart, translationEnd, rotate, scale) -> None:
-        self.color = color
-        self.translationStart = translationStart
-        self.translationEnd = translationEnd
-        self.translationCurr = Vector(self.translationStart[0], self.translationStart[1], self.translationStart[2])
-        self.rotate = rotate
-        self.scale = scale
-        self.direction = Vector(self.translationStart[0], self.translationStart[1], self.translationStart[2]) - Vector(
-            self.translationEnd[0], self.translationEnd[1], self.translationEnd[2])
+        self.color = Color(float(color[0]), float(color[1]), float(color[2]))
+        self.translationStart = Vector(float(translationStart[0]), float(translationStart[1]), float(translationStart[2]))
+        self.translationEnd = Vector(float(translationEnd[0]), float(translationEnd[1]), float(translationEnd[2]))
+        self.translationCurr = self.translationStart
+        self.rotate = Vector(float(rotate[0]), float(rotate[1]), float(rotate[2]))
+        self.scale = Vector(float(scale[0]), float(scale[1]), float(scale[2]))
+        self.direction = self.translationStart - self.translationEnd
 
     def update(self, move):
         if self.direction.x != 0:
             if self.direction.x > 0:
                 self.translationCurr.x -= move
-                if self.translationCurr.x < self.translationStart[0]:
+                if self.translationCurr.x < self.translationStart.x:
                     self.direction.x = -self.direction.x
             elif self.direction.x < 0:
                 self.translationCurr.x += move
-                if self.translationCurr.x > self.translationEnd[0]:
+                if self.translationCurr.x > self.translationEnd.x:
                     self.direction.x = -self.direction.x
         if self.direction.z != 0:
             if self.direction.z > 0:
                 self.translationCurr.z -= move
-                if self.translationCurr.z < self.translationStart[2]:
+                if self.translationCurr.z < self.translationStart.z:
                     self.direction.z = -self.direction.z
             elif self.direction.z < 0:
                 self.translationCurr.z += move
-                if self.translationCurr.z > self.translationEnd[2]:
+                if self.translationCurr.z > self.translationEnd.z:
                     self.direction.z = -self.direction.z
 
     def checkIfCollission(self, x, z, r):
-        P1_x = self.translationCurr.x - (self.scale[0] * 0.5)
-        P1_z = self.translationCurr.z - (self.scale[2] * 0.5)
-        P2_x = self.translationCurr.x + (self.scale[0] * 0.5)
-        P2_z = self.translationCurr.z + (self.scale[2] * 0.5)
+        P1_x = self.translationCurr.x - (self.scale.x * 0.5)
+        P1_z = self.translationCurr.z - (self.scale.z * 0.5)
+        P2_x = self.translationCurr.x + (self.scale.x * 0.5)
+        P2_z = self.translationCurr.z + (self.scale.z * 0.5)
         if x + r >= P1_x and z + r >= P1_z and x - r <= P2_x and z - r <= P2_z:
             return True
         return False

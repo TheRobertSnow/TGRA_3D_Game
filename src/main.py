@@ -38,7 +38,7 @@ class FpsGame:
         self.levelWalls = self.levelLoader.walls
         self.levelEvilObjects = self.levelLoader.evilObjects
         self.startPoint = self.levelLoader.startPoint
-        self.endPoint = self.levelLoader.endPoint
+        self.endPoint = self.levelLoader.endPoint[0]
 
         # /==/ Network Interface /==/
         self.netInterf = Interface()
@@ -56,6 +56,11 @@ class FpsGame:
         self.jeff_texture = self.load_texture("/src/assets/meshes/player/jeff.png")
         self.mr_box_texture = self.load_texture("/src/assets/meshes/mr_box/box.png")
         self.brick_texture = self.load_texture("/src/assets/meshes/bricks.jpg")
+        self.base_texture = self.load_texture("/src/assets/meshes/base.png")
+        self.ground_texture = self.load_texture("/src/assets/meshes/ground.jpg")
+        self.walls_texture = self.load_texture("/src/assets/meshes/walls.jpg")
+        self.evil_texture = self.load_texture("/src/assets/meshes/evil.jpg")
+        self.finish_texture = self.load_texture("/src/assets/meshes/finish.jpg")
         self.health_texture = self.load_texture("/src/assets/meshes/health.jpg")
         self.health_back_texture = self.load_texture("/src/assets/meshes/health_back.jpg")
 
@@ -204,8 +209,6 @@ class FpsGame:
             print("Health: " + str(self.health))
             # print(self.opponents)
 
-
-
     def check_if_player_moving(self):
         if W_KEY.isPressed:
             return True
@@ -314,7 +317,7 @@ class FpsGame:
         self.shader.set_eye_position(self.view_matrix.eye)
         self.model_matrix.load_identity()
 
-        light_pos = [(21.0, 10.0, 1.75, 1.0), (-21.0, 1.5, 1.75, 1.0), (0.0, 1.5, 1.75, 1.0)]
+        light_pos = [(21.0, 1.0, 1.75, 1.0), (-21.0, 1.5, 1.75, 1.0), (0.0, 1.5, 1.75, 1.0)]
         light_dif = [(1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0)]
         light_spe = [(0.8, 0.8, 0.8, 1.0), (0.8, 0.8, 0.8, 1.0), (0.8, 0.8, 0.8, 1.0)]
         light_amb = [(0.05, 0.05, 0.05, 1.0), (0.05, 0.05, 0.05, 1.0), (0.05, 0.05, 0.05, 1.0)]
@@ -329,69 +332,30 @@ class FpsGame:
         self.cube.set_vertices(self.shader)
 
         # |===== DRAW OBJECTS =====|
-
         # DRAW GROUND
-        # for ground in self.levelGround:
-        #     self.shader.set_material_diffuse(Color(ground.color[0], ground.color[1], ground.color[2]))
-        #     self.shader.set_material_specular(Color(0.1, 0.1, 0.1))
-        #     self.shader.set_material_ambient(Color(0.1, 0.1, 0.1))
-        #     self.shader.set_material_shininess(1.0)
-        #     self.model_matrix.push_matrix()
-        #     self.model_matrix.add_translation(ground.translation[0], ground.translation[1], ground.translation[2])
-        #     self.model_matrix.add_rotate_x(ground.rotate[0])
-        #     self.model_matrix.add_rotate_y(ground.rotate[1])
-        #     self.model_matrix.add_rotate_z(ground.rotate[2])
-        #     self.model_matrix.add_scale(ground.scale[0], ground.scale[1], ground.scale[2])
-        #     self.shader.set_model_matrix(self.model_matrix.matrix)
-        #     self.cube.draw(self.shader)
-        #     self.model_matrix.pop_matrix()
-        #
-        # # DRAW WALLS
-        # for wall in self.levelWalls:
-        #     self.shader.set_material_diffuse(Color(wall.color[0], wall.color[1], wall.color[2]))
-        #     self.shader.set_material_specular(Color(0.1, 0.1, 0.1))
-        #     self.shader.set_material_ambient(Color(0.1, 0.1, 0.1))
-        #     self.shader.set_material_shininess(1.0)
-        #     self.model_matrix.push_matrix()
-        #     self.model_matrix.add_translation(wall.translation[0], wall.translation[1], wall.translation[2])
-        #     self.model_matrix.add_rotate_x(wall.rotate[0])
-        #     self.model_matrix.add_rotate_y(wall.rotate[1])
-        #     self.model_matrix.add_rotate_z(wall.rotate[2])
-        #     self.model_matrix.add_scale(wall.scale[0], wall.scale[1], wall.scale[2])
-        #     self.shader.set_model_matrix(self.model_matrix.matrix)
-        #     self.cube.draw(self.shader)
-        #     self.model_matrix.pop_matrix()
-        #
-        # # DRAW EVIL OBJECTS
-        # for evilObject in self.levelEvilObjects:
-        #     self.shader.set_material_diffuse(evilObject.color[0], evilObject.color[1], evilObject.color[2])
-        #     self.shader.set_material_specular(0.1, 0.1, 0.1)
-        #     self.shader.set_material_ambient(0.1, 0.1, 0.1)
-        #     self.shader.set_material_shininess(1.0)
-        #     self.model_matrix.push_matrix()
-        #     self.model_matrix.add_translation(evilObject.translationCurr.x, evilObject.translationCurr.y,
-        #                                          evilObject.translationCurr.z)
-        #     self.model_matrix.add_rotate_x(evilObject.rotate[0])
-        #     self.model_matrix.add_rotate_y(evilObject.rotate[1])
-        #     self.model_matrix.add_rotate_z(evilObject.rotate[2])
-        #     self.model_matrix.add_scale(evilObject.scale[0], evilObject.scale[1], evilObject.scale[2])
-        #     self.shader.set_model_matrix(self.model_matrix.matrix)
-        #     self.cube.draw(self.shader)
-        #     self.model_matrix.pop_matrix()
-        #
-        # # DRAW FINISH LINE BOX
-        # self.shader.set_material_diffuse(self.endPoint[0].color[0], self.endPoint[0].color[1],
-        #                                 self.endPoint[0].color[2])
-        # self.shader.set_material_specular(0.1, 0.1, 0.1)
-        # self.shader.set_material_ambient(0.1, 0.1, 0.1)
-        # self.shader.set_material_shininess(1.0)
-        # self.model_matrix.push_matrix()
-        # self.model_matrix.add_translation(self.endPoint[0].position[0], self.endPoint[0].position[1],
-        #                                 self.endPoint[0].position[2])
-        # self.model_matrix.add_scale(self.endPoint[0].scale[0], self.endPoint[0].scale[1], self.endPoint[0].scale[2])
-        # self.shader.set_model_matrix(self.model_matrix.matrix)
-        # self.cube.draw(self.shader)
-        # self.model_matrix.pop_matrix()
+        for ground in self.levelGround:
+            self.shader.set_material_diffuse(ground.color)
+            self.shader.set_material_specular(Color(0.1, 0.1, 0.1))
+            self.shader.set_material_ambient(Color(0.1, 0.1, 0.1))
+            self.shader.set_material_shininess(1.0)
+            self.drawObject(self.cube, self.base_texture, ground.translation, ground.scale, ground.rotate)
+
+        # DRAW WALLS
+        for wall in self.levelWalls:
+            self.shader.set_material_diffuse(wall.color)
+            self.shader.set_material_specular(Color(0.1, 0.1, 0.1))
+            self.shader.set_material_ambient(Color(0.1, 0.1, 0.1))
+            self.shader.set_material_shininess(1.0)
+            self.drawObject(self.cube, self.base_texture, wall.translation, wall.scale, wall.rotate)
+
+        # DRAW EVIL OBJECTS
+        for evilObject in self.levelEvilObjects:
+            self.shader.set_material_diffuse(Color(1.0, 1.0, 1.0))
+            self.drawObject(self.cube, self.evil_texture, evilObject.translationCurr, evilObject.scale, evilObject.rotate)
+
+        # DRAW FINISH LINE BOX
+        self.shader.set_material_diffuse(Color(1.0, 1.0, 1.0))
+        self.drawObject(self.cube, self.finish_texture, self.endPoint.position, self.endPoint.scale)
 
 
         # self.sphere.set_vertices(self.shader)
@@ -439,12 +403,12 @@ class FpsGame:
 
         # /==/ Draw jeff /==/
         if not self.player.isHit:
+            # x max 0.30
+            # x min -0.30
             # y max 2.15
             # y min 0.01
-            # x max 0.35
-            # x min -0.35
-            # z max 0.35
-            # z max -0.35
+            # z max 0.30
+            # z max -0.30
             self.player.set_aabb(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
             self.drawObject(self.player, self.jeff_texture, Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), Vector(0.0, 1.5708, 0.0))
 
@@ -499,7 +463,7 @@ class FpsGame:
         self.cube.set_vertices(self.shader)
 
         self.drawObject(self.cube, self.health_back_texture)
-        self.drawObject(self.cube, self.health_texture, Vector(0.0, -1.0 * 0.5, 0.0))
+        self.drawObject(self.cube, self.health_texture, Vector(0.0, -1.0 * (1 - self.health/100), 0.0))
 
         glDisable(GL_DEPTH_TEST)
 
@@ -512,7 +476,7 @@ class FpsGame:
         self.model_matrix.load_identity()
 
         self.cube.set_vertices(self.shader)
-        self.drawObject(self.cube, self.health_back_texture)
+        self.drawObject(self.cube, self.health_texture)
 
         glDisable(GL_DEPTH_TEST)
 
@@ -524,7 +488,7 @@ class FpsGame:
         self.model_matrix.load_identity()
 
         self.cube.set_vertices(self.shader)
-        self.drawObject(self.cube, self.health_back_texture)
+        self.drawObject(self.cube, self.health_texture)
 
         glDisable(GL_DEPTH_TEST)
 

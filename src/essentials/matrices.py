@@ -196,7 +196,7 @@ class ViewMatrix:
                 0, 0, 0, 1]
 
     def get_eye_str(self):
-        return str(self.eye.x) + ",0.0," + str(self.eye.z) + ";"
+        return str(self.eye.x) + "," + str(self.eye.y) + "," + str(self.eye.z) + ";"
 
     def get_u_str(self):
         return str(self.u.x) + "," + str(self.u.y) + "," + str(self.u.z) + ";"
