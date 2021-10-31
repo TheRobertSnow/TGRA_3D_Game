@@ -3,6 +3,7 @@ from math import *  # trigonometry
 from src.essentials.base_3d_objects import *
 from src.essentials.point import Point
 from src.essentials.vector import Vector
+from src.essentials.settings import *
 
 
 class ModelMatrix:
@@ -196,7 +197,7 @@ class ViewMatrix:
                 0, 0, 0, 1]
 
     def get_eye_str(self):
-        return str(self.eye.x) + "," + str(self.eye.y) + "," + str(self.eye.z) + ";"
+        return str(self.eye.x) + "," + str(self.eye.y - CAMERA_HEIGHT) + "," + str(self.eye.z) + ";"
 
     def get_u_str(self):
         return str(self.u.x) + "," + str(self.u.y) + "," + str(self.u.z) + ";"

@@ -73,7 +73,7 @@ class FpsGame:
 
         # /==/ View Matrix /==/
         self.view_matrix = ViewMatrix()
-        self.view_matrix.look(Point(1, 1.8, 0), Point(0, 0, 0), Vector(0, 1, 0))
+        self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
 
         # /==/ View Matrix For Health Bar and Crosshair /==/
         self.view_matrix2 = ViewMatrix()
@@ -439,17 +439,17 @@ class FpsGame:
 
         # /==/ Draw Opponents /==/
         for op in self.opponents:
-            if not op.died:
-                glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
-                self.model_matrix.push_matrix()
-                self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
-                self.model_matrix.add_rotate_y(1.5708 + op.angle)
-                self.model_matrix.add_scale(1.0, 1.0, 1.0)
-                self.shader.set_model_matrix(self.model_matrix.matrix)
-                op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
-                op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
-                self.player.draw(self.shader)
-                self.model_matrix.pop_matrix()
+            #if not op.died:
+            glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
+            self.model_matrix.push_matrix()
+            self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
+            self.model_matrix.add_rotate_y(1.5708 + op.angle)
+            self.model_matrix.add_scale(1.0, 1.0, 1.0)
+            self.shader.set_model_matrix(self.model_matrix.matrix)
+            op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
+            op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
+            self.player.draw(self.shader)
+            self.model_matrix.pop_matrix()
 
         glDisable(GL_DEPTH_TEST)
 
