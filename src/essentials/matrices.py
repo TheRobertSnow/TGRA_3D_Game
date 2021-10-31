@@ -3,6 +3,7 @@ from math import *  # trigonometry
 from src.essentials.base_3d_objects import *
 from src.essentials.point import Point
 from src.essentials.vector import Vector
+from src.essentials.settings import CAMERA_HEIGHT
 
 
 class ModelMatrix:
@@ -137,11 +138,11 @@ class ViewMatrix:
     def jump(self, del_y):
         self.eye += self.v * del_y
 
-    def move(self, del_u, del_v, del_n, jeff):
-        posX = jeff[0]
-        negX = jeff[1]
-        posZ = jeff[2]
-        negZ = jeff[3]
+    def move(self, del_u, del_v, del_n, positionArray):
+        posX = positionArray[0]
+        negX = positionArray[1]
+        posZ = positionArray[2]
+        negZ = positionArray[3]
         vect = self.u * del_u + self.v * del_v + self.direction * del_n
         if posX:
             if vect.x > 0:
@@ -196,7 +197,7 @@ class ViewMatrix:
                 0, 0, 0, 1]
 
     def get_eye_str(self):
-        return str(self.eye.x) + "," + str(self.eye.y) + "," + str(self.eye.z) + ";"
+        return str(self.eye.x) + "," + str(self.eye.y - CAMERA_HEIGHT) + "," + str(self.eye.z) + ";"
 
     def get_u_str(self):
         return str(self.u.x) + "," + str(self.u.y) + "," + str(self.u.z) + ";"

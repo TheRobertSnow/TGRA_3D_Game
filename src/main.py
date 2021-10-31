@@ -73,7 +73,7 @@ class FpsGame:
 
         # /==/ View Matrix /==/
         self.view_matrix = ViewMatrix()
-        self.view_matrix.look(Point(1, 1.8, 0), Point(0, 0, 0), Vector(0, 1, 0))
+        self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
 
         # /==/ View Matrix For Health Bar and Crosshair /==/
         self.view_matrix2 = ViewMatrix()
@@ -120,6 +120,8 @@ class FpsGame:
         self.playersHit = []
         self.health = 100
         self.died = False
+        self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
+        self.collission = False
 
     def load_texture(self, filePath):
         # Loading and Binding Texture
@@ -229,20 +231,57 @@ class FpsGame:
     # |===== UPDATE =====|
     def update(self):
         delta_time = self.clock.tick() / 1000.0
+        print(self.aabb)
 
         self.angle += pi * delta_time
         # if self.angle > 2 * pi:
         #     self.angle -= (2 * pi)
 
+        # /==/ Update Max Min of AABB /==/
+        self.aabb.set_max(
+            Vector(0.70 + self.view_matrix.eye.x, 2.15 + self.view_matrix.eye.y, 0.70 + self.view_matrix.eye.z))
+        self.aabb.set_min(
+            Vector(-0.70 + self.view_matrix.eye.x, 0.01 + self.view_matrix.eye.y, -0.70 + self.view_matrix.eye.z))
+
+        # Movement disabled
+        slidePosX = False
+        slideNegX = False
+        slidePosZ = False
+        slideNegZ = False
+
+        # Collision detection
+        collisionRadius = 0.75
+        for wall in self.levelWalls:
+            data = wall.checkIfCollission(self.aabb.min, self.aabb.max)
+            if data[0]:
+                self.collission = True
+                if not slidePosX:
+                    slidePosX = data[1]
+                if not slideNegX:
+                    slideNegX = data[2]
+                if not slidePosZ:
+                    slidePosZ = data[3]
+                if not slideNegZ:
+                    slideNegZ = data[4]
+
+        # evilCollisionRadius = 0.5
+        # for evilObject in self.levelEvilObjects:
+        #     evilObject.update(1 * delta_time)  # Move evil objects back and forth
+        #     if evilObject.checkIfCollission(self.viewMatrix.eye.x, self.viewMatrix.eye.z,
+        #                                     evilCollisionRadius):  # if collission then game over
+        #         print("You Lost The Game")
+        #         exit()
+
         # /==/ User Input /==/
+        blockedPosArray = [slidePosX, slideNegX, slidePosZ, slideNegZ]
         if W_KEY.isPressed:
-            self.view_matrix.slide(0, 0, -self.speed * delta_time)
+            self.view_matrix.move(0, 0, -self.speed * delta_time, blockedPosArray)
         if A_KEY.isPressed:
-            self.view_matrix.slide(-self.speed * delta_time, 0, 0)
+            self.view_matrix.move(-self.speed * delta_time, 0, 0, blockedPosArray)
         if S_KEY.isPressed:
-            self.view_matrix.slide(0, 0, self.speed * delta_time)
+            self.view_matrix.move(0, 0, self.speed * delta_time, blockedPosArray)
         if D_KEY.isPressed:
-            self.view_matrix.slide(self.speed * delta_time, 0, 0)
+            self.view_matrix.move(self.speed * delta_time, 0, 0, blockedPosArray)
         if LSHIFT_KEY.isPressed:
             self.speed = MOVEMENTSPEED * 2
         if not LSHIFT_KEY.isPressed:
