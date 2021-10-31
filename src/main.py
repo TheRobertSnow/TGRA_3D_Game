@@ -42,20 +42,14 @@ class FpsGame:
 
         # /==/ Network Interface /==/
         self.netInterf = Interface()
-        # self.netId = uuid.uuid1()
         self.netId = id
         self.xzAngle = 0.0
 
         # /==/ Mesh Loader /==/
         self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
-        self.mr_box = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/mr_box", "mr_box.obj")
-        self.cent = kari_loader.load_obj_file(sys.path[0] + "/src/data/objects", "cent.obj")
-        self.soldier = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/soldier", "dusty_2.obj")
 
         # /==/ Texture Loader /==/
         self.jeff_texture = self.load_texture("/src/assets/meshes/player/jeff.png")
-        self.mr_box_texture = self.load_texture("/src/assets/meshes/mr_box/box.png")
-        self.brick_texture = self.load_texture("/src/assets/meshes/bricks.jpg")
         self.base_texture = self.load_texture("/src/assets/meshes/base.png")
         self.ground_texture = self.load_texture("/src/assets/meshes/ground.jpg")
         self.walls_texture = self.load_texture("/src/assets/meshes/walls.jpg")
@@ -405,86 +399,6 @@ class FpsGame:
         # DRAW FINISH LINE BOX
         self.shader.set_material_diffuse(Color(1.0, 1.0, 1.0))
         self.drawObject(self.cube, self.finish_texture, self.endPoint.position, self.endPoint.scale)
-
-
-        # self.sphere.set_vertices(self.shader)
-        # Draw the lines of the polygon, but not fill it
-        # Good for working with hitbox
-        # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-
-        # /==/ Draw sphere /==/
-        self.drawObject(self.sphere, self.brick_texture, Vector(3.0, 5.0, 10.0), Vector(2.0, 2.0, 2.0))
-
-        # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-
-        #self.cube.set_vertices(self.shader)
-        #self.shader.set_diffuse_tex(1)
-        # self.shader.set_specular_tex(1)
-        # self.shader.set_ambient_tex(1)
-        # self.shader.set_material_diffuse(Color(0.2, 0.2, 0.8))
-        # self.shader.set_material_ambient(Color(0.0, 0.0, 1.0))
-        # self.model_matrix.push_matrix()
-        # self.model_matrix.add_translation(0.0, 3.0, 0.0)
-        # self.model_matrix.add_rotate_y(self.angle)
-        # self.model_matrix.add_rotate_z(self.angle)
-        # self.model_matrix.add_scale(0.2, 2.5, 1.5)
-        # self.shader.set_model_matrix(self.model_matrix.matrix)
-        # self.cube.draw(self.shader)
-        # self.model_matrix.pop_matrix()
-
-        # self.shader.set_diffuse_tex(1)
-        # self.shader.set_specular_tex(1)
-        # self.shader.set_ambient_tex(1)
-        # self.shader.set_material_diffuse(Color(0.8, 0.2, 0.8))
-        # self.shader.set_material_ambient(Color(1.0, 0.0, 1.0))
-        # self.model_matrix.push_matrix()
-        # self.model_matrix.add_translation(0.0, 0.0, -3.0)
-        # self.model_matrix.add_rotate_x(self.angle * 0.4)
-        # self.model_matrix.add_rotate_y(self.angle * 0.2)
-        # self.model_matrix.add_scale(0.5, 0.5, 0.5)
-        # self.shader.set_model_matrix(self.model_matrix.matrix)
-        # self.cube.draw(self.shader)
-        # self.model_matrix.pop_matrix()
-        #
-
-        # /==/ Draw mr_box /==/
-        self.drawObject(self.mr_box, self.mr_box_texture, Vector(5.0, 1.0, 1.0))
-
-        # /==/ Draw jeff /==/
-        if not self.player.isHit:
-            # x max 0.30
-            # x min -0.30
-            # y max 2.15
-            # y min 0.01
-            # z max 0.30
-            # z max -0.30
-            self.player.set_aabb(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
-            self.drawObject(self.player, self.jeff_texture, Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), Vector(0.0, 1.5708, 0.0))
-
-        # self.model_matrix.push_matrix()
-        # self.model_matrix.add_translation(4.0, 4.0, 4.0)
-        # self.model_matrix.add_scale(0.1, 0.1, 0.1)
-        # self.shader.set_model_matrix(self.model_matrix.matrix)
-        # self.cent.draw(self.shader)
-        # self.model_matrix.pop_matrix()
-        #
-        # self.model_matrix.push_matrix()
-        # self.model_matrix.add_translation(0.0, 0.0, 4.0)
-        # self.model_matrix.add_scale(0.001, 0.001, 0.001)
-        # self.shader.set_model_matrix(self.model_matrix.matrix)
-        # self.soldier.draw(self.shader)
-        # self.model_matrix.pop_matrix()
-        #
-        # self.shader.set_diffuse_tex(1)
-        # self.shader.set_specular_tex(1)
-        # self.shader.set_ambient_tex(1)
-        # self.model_matrix.push_matrix()
-        # self.model_matrix.add_translation(0.0, 0.0, -3.0)
-        # self.model_matrix.add_rotate_x(self.angle * 0.4)
-        # self.model_matrix.add_scale(1.0, 1.0, 1.0)
-        # self.shader.set_model_matrix(self.model_matrix.matrix)
-        # self.cube.draw(self.shader)
-        # self.model_matrix.pop_matrix()
 
         # /==/ Draw Opponents /==/
         for op in self.opponents:
