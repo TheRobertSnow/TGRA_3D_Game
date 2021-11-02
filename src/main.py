@@ -96,6 +96,18 @@ class FpsGame:
         self.clock.tick()
         self.t0 = time.process_time()
 
+        # /==/ Sounds /==/
+        pygame.mixer.init()
+        self.mainMusic = pygame.mixer.Sound(SOUND_MAIN_MUSIC)
+        self.gunSound = pygame.mixer.Sound(SOUND_GUNSHOT)
+        self.mainMusic.set_volume(0.1)
+        self.gunSound.set_volume(0.1)
+        pygame.mixer.Channel(0).play(self.mainMusic, -1)
+        # self.mainMusic.play(-1)
+        # pygame.mixer.Channel(0).play(self.mainMusic)
+        # pygame.mixer.Channel(1).play(pygame.mixer.Sound(sys.path[0] + SOUND_GUNSHOT))
+
+
         # /==/ Init Input /==/
         # Hide the mouse cursor
         pygame.mouse.set_visible(False)
@@ -509,6 +521,7 @@ class FpsGame:
                     self.mouseMove = True
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     self.fireGun = True
+                    pygame.mixer.Channel(1).play(self.gunSound)
                 else:
                     self.mouseMove = False
 

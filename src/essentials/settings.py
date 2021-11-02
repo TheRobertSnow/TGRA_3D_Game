@@ -58,6 +58,8 @@ COLLISION_TEST = "collisionTest.json"
 # |===== FILES =====|
 COMPLEX_3D_VERT = "/src/shaders/vert/complex3D.vert"
 COMPLEX_3D_FRAG = "/src/shaders/frag/complex3D.frag"
+SOUND_GUNSHOT = './src/assets/sound/gun_shot.wav'
+SOUND_MAIN_MUSIC = './src/assets/sound/main.wav'
 
 # |===== NETWORK =====|
 EXTERNAL_IP = "127.0.0.1"
