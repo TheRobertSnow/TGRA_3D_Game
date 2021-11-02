@@ -1,18 +1,7 @@
 
 # |===== IMPORTS =====|
-
-from OpenGL.GL import *
-from OpenGL.GLU import *
-
-from math import *
-
-import pygame
 from pygame.locals import *
-
-import uuid
-import sys
 import time
-
 from src.shaders.shaders import *
 from src.essentials.matrices import *
 from src.essentials.settings import *
@@ -20,7 +9,7 @@ from src.essentials.base_3d_objects import *
 from src.essentials.color import Color
 from src.data.level_loader import *
 from src.network.interface import Interface
-from src.data import kari_loader
+from src.data import mesh_loader
 from src.player.player import *
 from src.essentials.hitbox import HitboxAABB
 from PIL import Image, ImageDraw, ImageFont
@@ -28,7 +17,6 @@ from PIL import Image, ImageDraw, ImageFont
 # |===== MAIN PROGRAM CLASS =====|ds
 class FpsGame:
     def __init__(self, mode, id):
-
         pygame.init()
         pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF)
 
@@ -45,19 +33,6 @@ class FpsGame:
         self.netInterf = Interface()
         self.netId = id
         self.xzAngle = 0.0
-
-        # /==/ Mesh Loader /==/
-        self.player = kari_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
-
-        # /==/ Texture Loader /==/
-        self.jeff_texture = self.load_texture("/src/assets/meshes/player/jeff.png")
-        self.base_texture = self.load_texture("/src/assets/meshes/base.png")
-        self.ground_texture = self.load_texture("/src/assets/meshes/ground.jpg")
-        self.walls_texture = self.load_texture("/src/assets/meshes/walls.jpg")
-        self.evil_texture = self.load_texture("/src/assets/meshes/evil.jpg")
-        self.finish_texture = self.load_texture("/src/assets/meshes/finish.jpg")
-        self.health_texture = self.load_texture("/src/assets/meshes/health.jpg")
-        self.health_back_texture = self.load_texture("/src/assets/meshes/health_back.jpg")
 
         # /==/ Shaders /==/
         self.shader = Shader3D()
@@ -83,14 +58,21 @@ class FpsGame:
         self.projection_matrix2.set_orthographic(-0.5, 0.5, -0.5, 0.5, 0.5, 100)
 
         # /==/ Players /==/
-        self.playerCharacter = Player()
         self.opponents = []
-
-        self.bullets = []
 
         # /==/ Meshes /==/
         self.cube = Cube()
-        self.sphere = Sphere()
+        self.player = mesh_loader.load_obj_file(sys.path[0] + "/src/assets/meshes/player", "jeff.obj")
+
+        # /==/ Texture Loader /==/
+        self.jeff_texture = self.load_texture("/src/assets/meshes/player/jeff.png")
+        self.base_texture = self.load_texture("/src/assets/meshes/base.png")
+        self.ground_texture = self.load_texture("/src/assets/meshes/ground.jpg")
+        self.walls_texture = self.load_texture("/src/assets/meshes/walls.jpg")
+        self.evil_texture = self.load_texture("/src/assets/meshes/evil.jpg")
+        self.finish_texture = self.load_texture("/src/assets/meshes/finish.jpg")
+        self.health_texture = self.load_texture("/src/assets/meshes/health.jpg")
+        self.health_back_texture = self.load_texture("/src/assets/meshes/health_back.jpg")
 
         # /==/ Time /==/
         self.clock = pygame.time.Clock()
@@ -108,7 +90,6 @@ class FpsGame:
         # pygame.mixer.Channel(0).play(self.mainMusic)
         # pygame.mixer.Channel(1).play(pygame.mixer.Sound(sys.path[0] + SOUND_GUNSHOT))
 
-
         # /==/ Init Input /==/
         # Hide the mouse cursor
         pygame.mouse.set_visible(False)
@@ -116,25 +97,22 @@ class FpsGame:
         pygame.event.set_grab(True)
 
         # /==/ Variables /==/
-        self.angle = 0
         self.speed = MOVEMENTSPEED
         self.upwards = 0
         self.jumping = False
         self.mouseMove = False
         self.fireGun = False
-        self.white_background = False
         self.gameMode = mode
         self.playersHit = []
         self.health = 100
         self.died = False
         self.lives = 5
         self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
-        self.collission = False
         self.respawned = False
         self.left = False
 
+    # |===== Loading and Binding Texture =====|
     def load_texture(self, filePath):
-        # Loading and Binding Texture
         surface = pygame.image.load(sys.path[0] + filePath)
         tex_string = pygame.image.tostring(surface, "RGBA", 1)
         width = surface.get_width()
@@ -146,13 +124,13 @@ class FpsGame:
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
         return tex_id
 
+    # |===== Draws Objects =====|
     def drawObject(self, object, texture, trans=Vector(0.0, 0.0, 0.0), scale=Vector(1.0, 1.0, 1.0), rotate=Vector(0.0, 0.0, 0.0)):
         glBindTexture(GL_TEXTURE_2D, texture)
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(trans.x, trans.y, trans.z)
         self.model_matrix.add_rotate_x(rotate.x)
         self.model_matrix.add_rotate_y(rotate.y)
-        print(rotate.y)
         self.model_matrix.add_rotate_z(rotate.z)
         self.model_matrix.add_scale(scale.x, scale.y, scale.z)
         self.shader.set_model_matrix(self.model_matrix.matrix)
@@ -244,6 +222,7 @@ class FpsGame:
         else:
             return False
 
+    # |===== Respawn Player =====|
     def respawn(self):
         self.lives -= 1
         if self.lives == 0:
@@ -261,10 +240,6 @@ class FpsGame:
     # |===== UPDATE =====|
     def update(self):
         delta_time = self.clock.tick() / 1000.0
-
-        self.angle += pi * delta_time
-        # if self.angle > 2 * pi:
-        #     self.angle -= (2 * pi)
 
         # /==/ Respawn /==/
         if self.died:
@@ -285,7 +260,6 @@ class FpsGame:
         for wall in self.levelWalls:
             data = wall.checkIfCollission(self.aabb.min, self.aabb.max)
             if data[0]:
-                self.collission = True
                 if not slidePosX:
                     slidePosX = data[1]
                 if not slideNegX:
@@ -356,10 +330,8 @@ class FpsGame:
             if self.check_if_player_moving():
                 t1 = time.process_time() - self.t0
                 if t1 >= 0.05 or self.left:
-                    # Add zxAngle to send()
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
-                    #self.xzAngle = 0.0
 
             recvString = self.netInterf.recv()
             if recvString != "":

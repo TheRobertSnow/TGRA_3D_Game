@@ -1,108 +1,80 @@
-# https://inareous.github.io/posts/opening-obj-using-py
-# https://en.wikipedia.org/wiki/Wavefront_.obj_file
-from OpenGL.GL import *
-from src.essentials.mesh import Mesh
+from src.essentials.mesh import MeshModel
+from src.essentials.material import Material
 from src.essentials.color import Color
 from src.essentials.point import *
 from src.essentials.vector import *
 
-def mtl_parser(fileName, name, mesh):
-    newmtl = None
-    shininess = 0.0
-    ambiance = Color(0, 0, 0)
-    diffuse = Color(0, 0, 0)
-    specular = Color(0, 0, 0)
-    transparency = 0.0
-    textureFile = ""
-    with open(fileName, "r") as file:
-        for line in file:
-            temp = line.strip("\n").split(" ")
-            # check if newmtl   name of material
-            if temp[0] == "newmtl":
-                if temp[1] != newmtl:
-                    newmtl = name
-            # check if Ns       "shininess"
-            elif temp[0] == "Ns":
-                shininess = float(temp[1])
-            # check if Ka       "ambience"
-            elif temp[0] == "Ka":
-                ambiance = Color(float(temp[1]), float(temp[2]), float(temp[3]))
-            # check if Kd       "diffuse"
-            elif temp[0] == "Kd":
-                diffuse = Color(float(temp[1]), float(temp[2]), float(temp[3]))
-            # check if Ks    "specular"  black (off) <==> Ks 0.000 0.000 0.000 |==| ranges between 0 and 1000 <==> Ns 10.000
-            elif temp[0] == "Ks":
-                specular = Color(float(temp[1]), float(temp[2]), float(temp[3]))
-            # check if Ke       Dunno what the fuck this is
-            # check if Ni       Honestly can ignore this part
-            # check if d        "transparency" or "dissolved"
-            elif temp[0] == "d":
-                transparency = float(temp[1])
-            # check if illum    I think we can ignore this too
-            # check if map_Kd   name of texture file
-            elif temp[0] == "map_Kd":
-                textureFile = temp[1]
-    mesh.add_material(newmtl, shininess, ambiance, diffuse, specular, transparency, textureFile)
+def load_mtl_file(file_location, file_name, mesh_model):
+    mtl = None
+    fin = open(file_location + "/" + file_name)
+    for line in fin.readlines():
+        tokens = line.split()
+        if len(tokens) == 0:
+            continue
+        if tokens[0] == "newmtl":
+            mtl = Material()
+            mesh_model.add_material(tokens[1], mtl)
+        elif tokens[0] == "Ka":
+            mtl.ambient = Color(float(tokens[1]), float(tokens[2]), float(tokens[3]))
+        elif tokens[0] == "Kd":
+            mtl.diffuse = Color(float(tokens[1]), float(tokens[2]), float(tokens[3]))
+        elif tokens[0] == "Ks":
+            mtl.specular = Color(float(tokens[1]), float(tokens[2]), float(tokens[3]))
+        elif tokens[0] == "Ns":
+            mtl.shininess = float(tokens[1])
 
-
-def obj_parser(fLoc, fName):
-    mesh = Mesh()
-    v = []
-    vt = []
-    vn = []
-    o = ""
+def load_obj_file(file_location, file_name):
+    mesh_model = MeshModel()
+    current_object_id = None
+    current_position_list = []
+    current_normal_list = []
+    current_uv_list = []
     # /==/ For AABB /==/
     vMax = Vector(0.0, 0.0, 0.0)
     vMin = Vector(0.0, 0.0, 0.0)
-    #usemtl = ""
-    with open(fLoc + "/" + fName, "r") as file:
-        for line in file:
-            temp = line.strip("\n").split(" ")
-            # Name of mtl file
-            if temp[0] == "mtllib":
-                mesh.materialFile = temp[1]
-                mtl_parser(fLoc + "/" + temp[1], temp[1], mesh)
-            # Name of object
-            elif temp[0] == "o":
-                if temp[1] != o:
-                    o = temp[1]
-            # Which material to use
-            elif temp[0] == "usemtl":
-                #if temp[1] != usemtl:
-                    #usemtl = temp[1]
-                mesh.add_objectMaterial(o, temp[1])
-            elif temp[0] == "v":
-                x, y, z = float(temp[1]), float[temp[2]], float[temp[3]]
-                # /==/ For AABB /==/
-                if x > vMax.x: vMax.x = x
-                if x < vMin.x: vMin.x = x
-                if y > vMax.y: vMax.y = y
-                if y < vMin.y: vMin.y = y
-                if z > vMax.z: vMax.z = z
-                if z < vMin.z: vMin.z = z
-                # /==/ Append to v /==/
-                v.append(Point(x, y, z))
-            elif temp[0] == "vt":
-                vt.append(Vector(float(temp[1]), float(temp[2]), 0.0))
-            elif temp[0] == "vn":
-                vn.append(Vector(float(temp[1]), float(temp[2]), float(temp[3])))
-            elif temp[0] == "f":
-                for i in range(1, len(temp)):
-                    temp[i] = temp[i].split("/")
-                vertex_count = len(temp) - 1
-                for i in range(vertex_count - 2):
-                    if v == None:
-                        v = []
-                    if vn == None:
-                        vn = []
-                    if vt == None:
-                        vt = []
-                    mesh.add_vertex(o, v[int(temp[1][0]) - 1], vn[int(temp[1][2]) - 1], vt[int(temp[1][1]) - 1])
-                    mesh.add_vertex(o, v[int(temp[i + 2][0]) - 1], vn[int(temp[i + 2][2]) - 1], vt[int(temp[i + 2][1]) - 1])
-                    mesh.add_vertex(o, v[int(temp[i + 3][0]) - 1], vn[int(temp[i + 3][2]) - 1], vt[int(temp[i + 3][1]) - 1])
-            mesh.set_opengl_buffers()
-        mesh.set_aabb
-    return mesh
-
-def loadObj(fLoc, fName):
-    return obj_parser(fLoc, fName)
+    fin = open(file_location + "/" + file_name)
+    for line in fin.readlines():
+        tokens = line.split()
+        if len(tokens) == 0:
+            continue
+        if tokens[0] == "mtllib":
+            # load the next token as material
+            load_mtl_file(file_location, tokens[1], mesh_model)
+        elif tokens[0] == "o":
+            # we are starting a new object
+            current_object_id = tokens[1]
+        elif tokens[0] == "v":
+            x, y, z = float(tokens[1]), float(tokens[2]), float(tokens[3])
+            # /==/ For AABB /==/
+            if x > vMax.x: vMax.x = x
+            if x < vMin.x: vMin.x = x
+            if y > vMax.y: vMax.y = y
+            if y < vMin.y: vMin.y = y
+            if z > vMax.z: vMax.z = z
+            if z < vMin.z: vMin.z = z
+            # /==/ Append to v /==/
+            current_position_list.append(Point(x, y, z))
+        elif tokens[0] == "vn":
+            current_normal_list.append(Vector(float(tokens[1]), float(tokens[2]), float(tokens[3])))
+        elif tokens[0] == "vt":
+            current_uv_list.append(Point(float(tokens[1]), float(tokens[2]), 0.0))
+        elif tokens[0] == "usemtl":
+            mesh_model.set_mesh_material(current_object_id, tokens[1])
+        elif tokens[0] == "f":
+            for i in range(1, len(tokens)):
+                tokens[i] = tokens[i].split("/") # Get
+            vertex_count = len(tokens) - 1
+            for i in range(vertex_count - 2):
+                if current_position_list == None:
+                    current_position_list = []
+                if current_normal_list == None:
+                    current_normal_list = []
+                if current_uv_list == None:
+                    current_uv_list = []
+                mesh_model.add_vertex(current_object_id, current_position_list[int(tokens[1][0])-1], current_normal_list[int(tokens[1][2])-1], current_uv_list[int(tokens[1][1])-1])
+                mesh_model.add_vertex(current_object_id, current_position_list[int(tokens[i+2][0])-1], current_normal_list[int(tokens[i+2][2])-1], current_uv_list[int(tokens[i+2][1])-1])
+                mesh_model.add_vertex(current_object_id, current_position_list[int(tokens[i+3][0])-1], current_normal_list[int(tokens[i+3][2])-1], current_uv_list[int(tokens[i+3][1])-1])
+    mesh_model.set_aabb(vMax, vMin)
+    # All models, vertices, and materials have been added to mesh_model, so set buffers
+    mesh_model.set_opengl_buffers()
+    return mesh_model

@@ -19,7 +19,7 @@ class Interface:
             self.sock.connect_ex((IP_ADDR, PORT))
             self.isAvailable = True
         except socket.error:
-            print("Cought exception socket.error")
+            print("Caught exception socket.error")
         # events = selectors.EVENT_READ | selectors.EVENT_WRITE
         # data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
 
