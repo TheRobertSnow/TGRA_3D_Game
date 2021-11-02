@@ -25,7 +25,7 @@ from src.player.player import *
 from src.essentials.hitbox import HitboxAABB
 from PIL import Image, ImageDraw, ImageFont
 
-# |===== MAIN PROGRAM CLASS =====|
+# |===== MAIN PROGRAM CLASS =====|ds
 class FpsGame:
     def __init__(self, mode, id):
 
@@ -152,6 +152,7 @@ class FpsGame:
         self.model_matrix.add_translation(trans.x, trans.y, trans.z)
         self.model_matrix.add_rotate_x(rotate.x)
         self.model_matrix.add_rotate_y(rotate.y)
+        print(rotate.y)
         self.model_matrix.add_rotate_z(rotate.z)
         self.model_matrix.add_scale(scale.x, scale.y, scale.z)
         self.shader.set_model_matrix(self.model_matrix.matrix)
@@ -252,6 +253,7 @@ class FpsGame:
             self.netInterf.closeSock()
             exit()
         self.health = 100
+        self.xzAngle = 0.0
         self.died = False
         self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
         self.respawned = True
@@ -295,7 +297,7 @@ class FpsGame:
 
         for evilObject in self.levelEvilObjects:
             evilObject.update(1 * delta_time)  # Move evil objects back and forth
-            if evilObject.checkIfCollission(self.aabb.min, self.aabb.max):  # if collission then game over
+            if evilObject.checkIfCollission(self.aabb.min, self.aabb.max):  # if collission then player dies
                 self.died = True
 
         # /==/ User Input /==/
@@ -357,7 +359,7 @@ class FpsGame:
                     # Add zxAngle to send()
                     self.t0 = time.process_time()
                     self.netInterf.send(self.create_net_str())
-                    self.zxAngle = 0.0
+                    #self.xzAngle = 0.0
 
             recvString = self.netInterf.recv()
             if recvString != "":
