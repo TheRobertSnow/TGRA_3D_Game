@@ -23,6 +23,7 @@ from src.network.interface import Interface
 from src.data import kari_loader
 from src.player.player import *
 from src.essentials.hitbox import HitboxAABB
+from PIL import Image, ImageDraw, ImageFont
 
 # |===== MAIN PROGRAM CLASS =====|
 class FpsGame:
@@ -114,6 +115,7 @@ class FpsGame:
         self.playersHit = []
         self.health = 100
         self.died = False
+        self.deathCounter = 0
         self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
         self.collission = False
         self.respawned = False
@@ -141,6 +143,8 @@ class FpsGame:
         self.model_matrix.add_rotate_z(rotate.z)
         self.model_matrix.add_scale(scale.x, scale.y, scale.z)
         self.shader.set_model_matrix(self.model_matrix.matrix)
+        if object == self.cube:
+            self.cube.set_vertices(self.shader)
         object.draw(self.shader)
         self.model_matrix.pop_matrix()
 
@@ -228,6 +232,7 @@ class FpsGame:
             return False
 
     def respawn(self):
+        self.deathCounter += 1
         self.health = 100
         self.died = False
         self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
@@ -371,9 +376,6 @@ class FpsGame:
         self.shader.set_light_ambient(light_amb)
         self.shader.set_global_ambient(0.2, 0.2, 0.2)
 
-
-        self.cube.set_vertices(self.shader)
-
         # |===== DRAW OBJECTS =====|
         # DRAW GROUND
         for ground in self.levelGround:
@@ -403,16 +405,19 @@ class FpsGame:
         # /==/ Draw Opponents /==/
         for op in self.opponents:
             # if not op.died:
-            glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
-            self.model_matrix.push_matrix()
-            self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
-            self.model_matrix.add_rotate_y(1.5708 + op.angle)
-            self.model_matrix.add_scale(1.0, 1.0, 1.0)
-            self.shader.set_model_matrix(self.model_matrix.matrix)
             op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
             op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
-            self.player.draw(self.shader)
-            self.model_matrix.pop_matrix()
+            self.drawObject(self.player, self.jeff_texture, op.position, Vector(1.0, 1.0, 1.0), Vector(0.0, 1.5708 + op.angle, 0.0))
+            #glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
+            #self.model_matrix.push_matrix()
+            #self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
+            #self.model_matrix.add_rotate_y(1.5708 + op.angle)
+            #self.model_matrix.add_scale(1.0, 1.0, 1.0)
+            #self.shader.set_model_matrix(self.model_matrix.matrix)
+            #op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
+            #op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
+            #self.player.draw(self.shader)
+            #self.model_matrix.pop_matrix()
 
         glDisable(GL_DEPTH_TEST)
 
@@ -423,7 +428,6 @@ class FpsGame:
         self.shader.set_view_matrix(self.view_matrix2.get_matrix())
         self.shader.set_projection_matrix(self.projection_matrix2.get_matrix())
         self.model_matrix.load_identity()
-        self.cube.set_vertices(self.shader)
 
         self.drawObject(self.cube, self.health_back_texture)
         self.drawObject(self.cube, self.health_texture, Vector(0.0, -1.0 * (1 - self.health/100), 0.0))
@@ -438,7 +442,6 @@ class FpsGame:
         self.shader.set_projection_matrix(self.projection_matrix2.get_matrix())
         self.model_matrix.load_identity()
 
-        self.cube.set_vertices(self.shader)
         self.drawObject(self.cube, self.health_texture)
 
         glDisable(GL_DEPTH_TEST)
@@ -450,8 +453,25 @@ class FpsGame:
         self.shader.set_projection_matrix(self.projection_matrix2.get_matrix())
         self.model_matrix.load_identity()
 
-        self.cube.set_vertices(self.shader)
         self.drawObject(self.cube, self.health_texture)
+
+        glDisable(GL_DEPTH_TEST)
+
+        # /==/ Draw Death Count /==/
+        glClear(GL_DEPTH_BUFFER_BIT)
+        glViewport(1290, 10, 140, 40)
+        glClearColor(0.78, 1.0, 1.0, 1.0)
+        self.shader.set_view_matrix(self.view_matrix2.get_matrix())
+        self.shader.set_projection_matrix(self.projection_matrix2.get_matrix())
+        self.model_matrix.load_identity()
+
+        img = Image.new('RGB', (220, 80), color=(73, 109, 137))
+        d = ImageDraw.Draw(img)
+        fnt = ImageFont.truetype('/Assets/Fonts/arial.ttf', 30)
+        d.text((10, 10), "Death Count: " + str(self.deathCounter), font=fnt, fill=(255, 255, 0))
+        img.save("src/assets/meshes/DeathCounter.png")
+        deathCounter_texture = self.load_texture("/src/assets/meshes/DeathCounter.png")
+        self.drawObject(self.cube, deathCounter_texture, Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), Vector(0.0, 1.57, 0.0))
 
         glDisable(GL_DEPTH_TEST)
 
@@ -466,6 +486,7 @@ class FpsGame:
                 if event.type == pygame.QUIT:
                     print("Quitting!")
                     self.left = True
+                    self.netInterf.closeSock()
                     self.create_net_str()
                     exiting = True
                 elif event.type == pygame.KEYDOWN:
@@ -473,8 +494,8 @@ class FpsGame:
                         print("Escaping!")
                         self.left = True
                         self.create_net_str()
+                        self.netInterf.closeSock()
                         exiting = True
-
                     if event.key == W_KEY.key:
                         W_KEY.isPressed = True
                     if event.key == A_KEY.key:
@@ -515,7 +536,6 @@ class FpsGame:
             self.update()
             self.display()
 
-        self.netInterf.closeSock()
         # OUT OF GAME LOOP
         pygame.quit()
 
