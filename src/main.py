@@ -197,7 +197,7 @@ class FpsGame:
                     if index != 0 and index != 1 and index != 2:
                         k, v = temp1[index].split(":")
                         if k == self.netId:
-                            if (v != "died"):
+                            if v != "died":
                                 self.health = int(v)
                             else:
                                 self.died = True
