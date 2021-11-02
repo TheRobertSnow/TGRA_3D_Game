@@ -127,7 +127,7 @@ class FpsGame:
         self.playersHit = []
         self.health = 100
         self.died = False
-        self.deathCounter = 0
+        self.lives = 5
         self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
         self.collission = False
         self.respawned = False
@@ -244,7 +244,13 @@ class FpsGame:
             return False
 
     def respawn(self):
-        self.deathCounter += 1
+        self.lives -= 1
+        if self.lives == 0:
+            print("You Are Out Of Lives")
+            self.left = True
+            self.create_net_str()
+            self.netInterf.closeSock()
+            exit()
         self.health = 100
         self.died = False
         self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
@@ -274,8 +280,6 @@ class FpsGame:
         slidePosZ = False
         slideNegZ = False
 
-        # Collision detection
-        collisionRadius = 0.75
         for wall in self.levelWalls:
             data = wall.checkIfCollission(self.aabb.min, self.aabb.max)
             if data[0]:
@@ -289,13 +293,10 @@ class FpsGame:
                 if not slideNegZ:
                     slideNegZ = data[4]
 
-        # evilCollisionRadius = 0.5
-        # for evilObject in self.levelEvilObjects:
-        #     evilObject.update(1 * delta_time)  # Move evil objects back and forth
-        #     if evilObject.checkIfCollission(self.viewMatrix.eye.x, self.viewMatrix.eye.z,
-        #                                     evilCollisionRadius):  # if collission then game over
-        #         print("You Lost The Game")
-        #         exit()
+        for evilObject in self.levelEvilObjects:
+            evilObject.update(1 * delta_time)  # Move evil objects back and forth
+            if evilObject.checkIfCollission(self.aabb.min, self.aabb.max):  # if collission then game over
+                self.died = True
 
         # /==/ User Input /==/
         blockedPosArray = [slidePosX, slideNegX, slidePosZ, slideNegZ]
@@ -420,16 +421,6 @@ class FpsGame:
             op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
             op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
             self.drawObject(self.player, self.jeff_texture, op.position, Vector(1.0, 1.0, 1.0), Vector(0.0, 1.5708 + op.angle, 0.0))
-            #glBindTexture(GL_TEXTURE_2D, self.jeff_texture)
-            #self.model_matrix.push_matrix()
-            #self.model_matrix.add_translation(op.position.x, op.position.y, op.position.z)
-            #self.model_matrix.add_rotate_y(1.5708 + op.angle)
-            #self.model_matrix.add_scale(1.0, 1.0, 1.0)
-            #self.shader.set_model_matrix(self.model_matrix.matrix)
-            #op.aabb.set_min(Vector(-0.30 + op.position.x, 0.01 + op.position.y, -0.30 + op.position.z))
-            #op.aabb.set_max(Vector(0.30 + op.position.x, 2.15 + op.position.y, 0.30 + op.position.z))
-            #self.player.draw(self.shader)
-            #self.model_matrix.pop_matrix()
 
         glDisable(GL_DEPTH_TEST)
 
@@ -471,16 +462,16 @@ class FpsGame:
 
         # /==/ Draw Death Count /==/
         glClear(GL_DEPTH_BUFFER_BIT)
-        glViewport(1290, 10, 140, 40)
+        glViewport(1290, 10, 140, 30)
         glClearColor(0.78, 1.0, 1.0, 1.0)
         self.shader.set_view_matrix(self.view_matrix2.get_matrix())
         self.shader.set_projection_matrix(self.projection_matrix2.get_matrix())
         self.model_matrix.load_identity()
 
-        img = Image.new('RGB', (220, 80), color=(73, 109, 137))
+        img = Image.new('RGB', (280, 60), color=(0, 0, 0))
         d = ImageDraw.Draw(img)
-        fnt = ImageFont.truetype('/Assets/Fonts/arial.ttf', 30)
-        d.text((10, 10), "Death Count: " + str(self.deathCounter), font=fnt, fill=(255, 255, 0))
+        fnt = ImageFont.truetype('/Assets/Fonts/arial.ttf', 40)
+        d.text((35, 5), "Lives left: " + str(self.lives), font=fnt, fill=(255, 0, 0))
         img.save("src/assets/meshes/DeathCounter.png")
         deathCounter_texture = self.load_texture("/src/assets/meshes/DeathCounter.png")
         self.drawObject(self.cube, deathCounter_texture, Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), Vector(0.0, 1.57, 0.0))
@@ -498,8 +489,8 @@ class FpsGame:
                 if event.type == pygame.QUIT:
                     print("Quitting!")
                     self.left = True
-                    self.netInterf.closeSock()
                     self.create_net_str()
+                    self.netInterf.closeSock()
                     exiting = True
                 elif event.type == pygame.KEYDOWN:
                     if event.key == K_ESCAPE:
@@ -550,7 +541,7 @@ class FpsGame:
             self.display()
 
         # OUT OF GAME LOOP
-        pygame.quit()
+        exit()
 
     # |===== STARTS THE PROGRAM =====|
     def start(self):

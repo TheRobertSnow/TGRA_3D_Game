@@ -54,7 +54,7 @@ class Mesh:
 
     def draw(self, shader):
         for key, value in self.objectMaterials.items():
-            print(key)
+            #print(key)
             #shader.set_position_attribute(self.vertexArrays[key])
             #shader.set_normal_attribute(self.normalArrays[key])
             #shader.set_uv_attribute(self.textureArrays[key])
