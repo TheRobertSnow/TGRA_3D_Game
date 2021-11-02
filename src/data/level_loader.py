@@ -8,6 +8,7 @@ from src.data.types.ground import Ground
 from src.data.types.evilObjects import EvilObject
 from src.data.types.startPoint import StartPoint
 from src.data.types.endPoint import EndPoint
+from src.data.types.spawnPoint import SpawnPoint
 
 
 class LevelLoader:
@@ -21,6 +22,7 @@ class LevelLoader:
         self.evilObjects = []
         self.startPoint = []
         self.endPoint = []
+        self.spawnPoints = []
 
     def read_level(self, fileName):
         f = open(self.fPrefix + fileName, 'r')
@@ -51,6 +53,11 @@ class LevelLoader:
         for i in data["endPoint"]:
             endPoint = EndPoint(i["color3f"], i["position"], i["scale3f"])
             self.endPoint.append(endPoint)
+
+        # Load spawnPoints
+        for i in data["spawnPoints"]:
+            spawnPoint = SpawnPoint(i["position"])
+            self.spawnPoints.append(spawnPoint)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ from src.essentials.color import *
 from src.essentials.vector import *
 
 class EvilObject:
-    # Class for handeling walls
+    # Class for handling evilObjects
     def __init__(self, color, translationStart, translationEnd, rotate, scale) -> None:
         self.color = Color(float(color[0]), float(color[1]), float(color[2]))
         self.translationStart = Vector(float(translationStart[0]), float(translationStart[1]), float(translationStart[2]))

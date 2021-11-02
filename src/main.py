@@ -2,6 +2,7 @@
 # |===== IMPORTS =====|
 from pygame.locals import *
 import time
+import random
 from src.shaders.shaders import *
 from src.essentials.matrices import *
 from src.essentials.settings import *
@@ -27,7 +28,7 @@ class FpsGame:
         self.levelWalls = self.levelLoader.walls
         self.levelEvilObjects = self.levelLoader.evilObjects
         self.startPoint = self.levelLoader.startPoint
-        self.endPoint = self.levelLoader.endPoint[0]
+        self.spawnPoints = self.levelLoader.spawnPoints
 
         # /==/ Network Interface /==/
         self.netInterf = Interface()
@@ -43,7 +44,8 @@ class FpsGame:
 
         # /==/ View Matrix /==/
         self.view_matrix = ViewMatrix()
-        self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
+        randSpawnPoint = self.spawnPoints[random.randint(0, len(self.spawnPoints)-1)].position
+        self.view_matrix.look(Point(randSpawnPoint.x, CAMERA_HEIGHT, randSpawnPoint.z), Point(0, 0, 0), Vector(0, 1, 0))
 
         # /==/ View Matrix For Health Bar and Crosshair /==/
         self.view_matrix2 = ViewMatrix()
@@ -70,7 +72,6 @@ class FpsGame:
         self.ground_texture = self.load_texture("/src/assets/meshes/ground.jpg")
         self.walls_texture = self.load_texture("/src/assets/meshes/walls.jpg")
         self.evil_texture = self.load_texture("/src/assets/meshes/evil.jpg")
-        self.finish_texture = self.load_texture("/src/assets/meshes/finish.jpg")
         self.health_texture = self.load_texture("/src/assets/meshes/health.jpg")
         self.health_back_texture = self.load_texture("/src/assets/meshes/health_back.jpg")
 
@@ -234,7 +235,8 @@ class FpsGame:
         self.health = 100
         self.xzAngle = 0.0
         self.died = False
-        self.view_matrix.look(Point(1, CAMERA_HEIGHT, 0), Point(0, 0, 0), Vector(0, 1, 0))
+        randSpawnPoint = self.spawnPoints[random.randint(0, len(self.spawnPoints)-1)].position
+        self.view_matrix.look(Point(randSpawnPoint.x, CAMERA_HEIGHT, randSpawnPoint.z), Point(0, 0, 0), Vector(0, 1, 0))
         self.respawned = True
 
     # |===== UPDATE =====|
@@ -245,17 +247,17 @@ class FpsGame:
         if self.died:
             self.respawn()
 
-        # /==/ Update Max Min of AABB /==/
-        self.aabb.set_max(
-            Vector(0.70 + self.view_matrix.eye.x, 2.15 + self.view_matrix.eye.y, 0.70 + self.view_matrix.eye.z))
-        self.aabb.set_min(
-            Vector(-0.70 + self.view_matrix.eye.x, 0.01 + self.view_matrix.eye.y, -0.70 + self.view_matrix.eye.z))
-
         # Movement disabled
         slidePosX = False
         slideNegX = False
         slidePosZ = False
         slideNegZ = False
+
+        # /==/ Update Max Min of AABB /==/
+        self.aabb.set_max(
+            Vector(0.50 + self.view_matrix.eye.x, 2.15 + self.view_matrix.eye.y, 0.50 + self.view_matrix.eye.z))
+        self.aabb.set_min(
+            Vector(-0.50 + self.view_matrix.eye.x, 0.01 + self.view_matrix.eye.y, -0.50 + self.view_matrix.eye.z))
 
         for wall in self.levelWalls:
             data = wall.checkIfCollission(self.aabb.min, self.aabb.max)
@@ -285,7 +287,7 @@ class FpsGame:
         if D_KEY.isPressed:
             self.view_matrix.move(self.speed * delta_time, 0, 0, blockedPosArray)
         if LSHIFT_KEY.isPressed:
-            self.speed = MOVEMENTSPEED * 2
+            self.speed = MOVEMENTSPEED * 1.3
         if not LSHIFT_KEY.isPressed:
             self.speed = MOVEMENTSPEED
 
@@ -384,10 +386,6 @@ class FpsGame:
         for evilObject in self.levelEvilObjects:
             self.shader.set_material_diffuse(Color(1.0, 1.0, 1.0))
             self.drawObject(self.cube, self.evil_texture, evilObject.translationCurr, evilObject.scale, evilObject.rotate)
-
-        # DRAW FINISH LINE BOX
-        self.shader.set_material_diffuse(Color(1.0, 1.0, 1.0))
-        self.drawObject(self.cube, self.finish_texture, self.endPoint.position, self.endPoint.scale)
 
         # /==/ Draw Opponents /==/
         for op in self.opponents:
