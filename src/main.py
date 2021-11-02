@@ -111,6 +111,7 @@ class FpsGame:
         self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
         self.respawned = False
         self.left = False
+        self.lost = False
 
     # |===== Loading and Binding Texture =====|
     def load_texture(self, filePath):
@@ -156,6 +157,8 @@ class FpsGame:
             self.respawned = False
         if self.left:
             netStr += ";" + self.netId + ":left"
+        if self.lost:
+            netStr += ";" + self.netId + ":lost"
         self.playersHit.clear()
         netStr += "/"
         return netStr
@@ -184,6 +187,7 @@ class FpsGame:
                 newPlayer.angle = float(temp1[2])
                 opponent = newPlayer
                 self.opponents.append(opponent)
+                print("Player:", opponent.name, "joined :)")
             else:
                 op.position = Point(float(eyex), float(eyey), float(eyez))
                 op.angle = float(temp1[2])
@@ -202,9 +206,16 @@ class FpsGame:
                                 if op.name == k:
                                     op.health = 100
                                     op.died = False
-                        if v == "left":
+                        if v == "left" or v == "lost":
                             for index, op in enumerate(self.opponents):
                                 if op.name == k:
+                                    if v == "lost":
+                                        print("You successfully killed player:", op.name)
+                                        print("You Won!!!")
+                                        self.netInterf.closeSock()
+                                        exit()
+                                    elif v == "left":
+                                        print("Player:", op.name, "left :(")
                                     self.opponents.pop(index)
 
     def check_if_player_moving(self):
@@ -227,8 +238,8 @@ class FpsGame:
     def respawn(self):
         self.lives -= 1
         if self.lives == 0:
-            print("You Are Out Of Lives")
-            self.left = True
+            print("You are out of lives and therefore you lost ://")
+            self.lost = True
             self.create_net_str()
             self.netInterf.closeSock()
             exit()
