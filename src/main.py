@@ -146,15 +146,15 @@ class FpsGame:
         netStr = "id:" + str(self.netId) + ";"
         netStr += self.view_matrix.get_eye_str()
         netStr += str(self.xzAngle)
+        if self.lost:
+            netStr += ";" + self.netId + ":lost"
+            return netStr
         if self.playersHit:
             for op in self.playersHit:
                 if op.died:
                     netStr += ";" + op.name + ":died"
                 else:
                     netStr += ";" + op.name + ":" + str(op.health)
-        if self.lost:
-            netStr += ";" + self.netId + ":lost"
-            return netStr
         if self.respawned:
             netStr += ";" + self.netId + ":respawn"
             self.respawned = False
