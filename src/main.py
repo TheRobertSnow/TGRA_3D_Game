@@ -152,13 +152,14 @@ class FpsGame:
                     netStr += ";" + op.name + ":died"
                 else:
                     netStr += ";" + op.name + ":" + str(op.health)
+        if self.lost:
+            netStr += ";" + self.netId + ":lost"
+            return netStr
         if self.respawned:
             netStr += ";" + self.netId + ":respawn"
             self.respawned = False
         if self.left:
             netStr += ";" + self.netId + ":left"
-        if self.lost:
-            netStr += ";" + self.netId + ":lost"
         self.playersHit.clear()
         netStr += "/"
         return netStr
@@ -210,13 +211,10 @@ class FpsGame:
                             print("v:", v)
                             for index, op in enumerate(self.opponents):
                                 if op.name == k:
-                                    if v == "lost":
-                                        print("You successfully killed player:", op.name)
-                                        print("You Won!!!")
-                                        self.netInterf.closeSock()
-                                        exit()
-                                    elif v == "left":
+                                    if v == "left":
                                         print("Player:", op.name, "left :(")
+                                    elif v == "lost":
+                                        print("Player:", op.name, "was killed")
                                     self.opponents.pop(index)
 
     def check_if_player_moving(self):
