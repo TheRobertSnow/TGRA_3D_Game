@@ -105,9 +105,9 @@ class FpsGame:
         self.fireGun = False
         self.gameMode = mode
         self.playersHit = []
-        self.health = 100
+        self.health = HEALTH
         self.died = False
-        self.lives = 5
+        self.lives = LIVES
         self.aabb = HitboxAABB(Vector(-0.30, 0.01, -0.30), Vector(0.30, 2.15, 0.30))
         self.respawned = False
         self.left = False
@@ -207,6 +207,7 @@ class FpsGame:
                                     op.health = 100
                                     op.died = False
                         if v == "left" or v == "lost":
+                            print("v:", v)
                             for index, op in enumerate(self.opponents):
                                 if op.name == k:
                                     if v == "lost":
